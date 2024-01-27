@@ -33,7 +33,7 @@ class TaskCreate(BaseModel):
     task_text: str
 
 async def get_db(user_name: str):
-    client = AsyncIOMotorClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net")
+    client = AsyncIOMotorClient("your_mongodb_connection_string")  # Replace with your actual MongoDB connection string
     return client[user_name]
 
 @router.post("/add_task/")
@@ -54,8 +54,7 @@ async def list_tasks(user_name: str, db = Depends(get_db)):
     tasks = await collection.find({}, {"_id": 1, "task_text": 1}).to_list(length=None)
 
     # Convert ObjectId to string
-    for task in tasks:
-        task["_id"] = str(task["_id"])
+    tasks = [{"_id": str(task["_id"]), "task_text": task["task_text"]} for task in tasks]
 
     return {"tasks": tasks}
 
@@ -65,8 +64,9 @@ async def delete_task(task_id: str, user_name: str, db = Depends(get_db)):
     collection = db[collection_name]
 
     # Validate ObjectId
-    obj_id = ObjectId.try_parse(task_id)
-    if obj_id is None:
+    try:
+        obj_id = ObjectId(task_id)
+    except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
 
     result = await collection.delete_one({"_id": obj_id})
