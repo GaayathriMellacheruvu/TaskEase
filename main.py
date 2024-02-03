@@ -124,5 +124,19 @@ async def get_task(task_id: str, user_name: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
 
+@router.delete("/delete_all_tasks/")
+async def delete_all_tasks(user_name: str):
+    collection_name = get_collection_name()
+    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
+    db = client[user_name]
+    collection = db[collection_name]
+
+    result = collection.delete_many({})
+
+    if result.deleted_count > 0:
+        return {"message": "All tasks deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="No tasks found to delete")
+
 
 app.include_router(router)
