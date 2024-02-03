@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, Depends
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
@@ -20,7 +20,7 @@ def get_collection_name():
 router = APIRouter()
 
 # Add CORS middleware
-origins = ["*"]  # Change this to your frontend's actual domain in production
+origins = ["https://task-ease-7f6t.onrender.com"]  # Change this to your frontend's actual domain in production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -32,8 +32,11 @@ app.add_middleware(
 class TaskCreate(BaseModel):
     task_text: str
 
+class TaskUpdate(BaseModel):
+    new_task_text: str
+
 @router.post("/add_task/")
-async def add_task(task_data: TaskCreate, user_name: str):
+async def add_task(task_data: TaskCreate, user_name: str, background_tasks: BackgroundTasks):
     collection_name = get_collection_name()
     client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
     db = client[user_name]
@@ -41,6 +44,8 @@ async def add_task(task_data: TaskCreate, user_name: str):
 
     task_document = {"task_text": task_data.task_text}
     result = collection.insert_one(task_document)
+
+    # Add background task to generate notification
 
     return {"message": "Task added successfully", "task_id": str(result.inserted_id)}
 
@@ -77,5 +82,68 @@ async def delete_task(task_id: str, user_name: str):
             raise HTTPException(status_code=404, detail=f"No data found with ObjectId: {task_id}")
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
+
+@router.put("/update_task/{task_id}/")
+async def update_task(task_id: str, task_data: TaskUpdate, user_name: str):
+    collection_name = get_collection_name()
+    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
+    db = client[user_name]
+    collection = db[collection_name]
+
+    try:
+        obj_id = ObjectId(task_id)
+        result = collection.update_one({"_id": obj_id}, {"$set": {"task_text": task_data.new_task_text}})
+
+        if result.modified_count > 0:
+            return {"message": f"Successfully updated task with ObjectId: {task_id}"}
+        else:
+            raise HTTPException(status_code=404, detail=f"No data found with ObjectId: {task_id}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
+
+@router.get("/get_task/{task_id}/")
+async def get_task(task_id: str, user_name: str):
+    collection_name = get_collection_name()
+    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
+    db = client[user_name]
+    collection = db[collection_name]
+
+    try:
+        obj_id = ObjectId(task_id)
+        task = collection.find_one({"_id": obj_id}, {"_id": 1, "task_text": 1})
+
+        if task:
+            task["_id"] = str(task["_id"])
+            return {"task": task}
+        else:
+            raise HTTPException(status_code=404, detail=f"No data found with ObjectId: {task_id}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
+
+@router.get("/count_tasks/")
+async def count_tasks(user_name: str):
+    collection_name = get_collection_name()
+    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
+    db = client[user_name]
+    collection = db[collection_name]
+
+    total_tasks = collection.count_documents({})
+
+    return {"total_tasks": total_tasks}
+
+@router.delete("/delete_all_tasks/")
+async def delete_all_tasks(user_name: str):
+    collection_name = get_collection_name()
+    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
+    db = client[user_name]
+    collection = db[collection_name]
+
+    result = collection.delete_many({})
+
+    if result.deleted_count > 0:
+        return {"message": "Successfully deleted all tasks"}
+    else:
+        raise HTTPException(status_code=404, detail="No tasks found to delete")
+
 
 app.include_router(router)
