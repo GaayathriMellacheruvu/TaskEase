@@ -42,7 +42,7 @@ class TaskCreate(BaseModel):
 @router.post("/add_task/")
 async def add_task(task_data: TaskCreate, user_name: str):
     collection_name = get_collection_name()
-    client = MongoClient(f"mongodb+srv://mellacheruvugaayathri:Ue99aD5KQLQCL7wZ@cluster0.kavkfm1.mongodb.net/{user_name}")
+    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
     db = client[user_name]
     collection = db[collection_name]
 
