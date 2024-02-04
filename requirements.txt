@@ -3,4 +3,4 @@ fastapi==0.73.0
 pymongo
 pydantic
 openai
-multipart
+python-multipart
