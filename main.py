@@ -1,12 +1,15 @@
-from fastapi import FastAPI, APIRouter, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, APIRouter, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
 from pydantic import BaseModel
+import openai
+from typing import List, Dict, Union
 
 app = FastAPI()
+
+openai.api_key = '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'
 
 @app.on_event("startup")
 async def startup_event():
@@ -81,10 +84,10 @@ async def delete_task(task_id: str, user_name: str):
         if result.deleted_count > 0:
             return {"message": f"Successfully deleted data with ObjectId: {task_id}"}
         else:
-            raise HTTPException(status_code=404, detail=f"No data found with ObjectId: {task_id}")
+            return {"message": f"No data found with ObjectId: {task_id}"}
     except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
-    
+        return {"message": "Invalid ObjectId format. Please enter a valid ObjectId."}
+
 @router.put("/update_task/{task_id}/")
 async def update_task(task_id: str, task_data: TaskUpdate, user_name: str):
     collection_name = get_collection_name()
@@ -100,9 +103,9 @@ async def update_task(task_id: str, task_data: TaskUpdate, user_name: str):
         if result.modified_count > 0:
             return {"message": f"Successfully updated task with ObjectId: {task_id}"}
         else:
-            raise HTTPException(status_code=404, detail=f"No data found with ObjectId: {task_id}")
+            return {"message": f"No data found with ObjectId: {task_id}"}
     except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
+        return {"message": "Invalid ObjectId format. Please enter a valid ObjectId."}
 
 @router.get("/get_task/{task_id}/")
 async def get_task(task_id: str, user_name: str):
@@ -120,9 +123,9 @@ async def get_task(task_id: str, user_name: str):
             task["_id"] = str(task["_id"])
             return {"task": task}
         else:
-            raise HTTPException(status_code=404, detail=f"No data found with ObjectId: {task_id}")
+            return {"message": f"No data found with ObjectId: {task_id}"}
     except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
+        return {"message": "Invalid ObjectId format. Please enter a valid ObjectId."}
 
 @router.delete("/delete_all_tasks/")
 async def delete_all_tasks(user_name: str):
@@ -136,7 +139,25 @@ async def delete_all_tasks(user_name: str):
     if result.deleted_count > 0:
         return {"message": "All tasks deleted successfully"}
     else:
-        raise HTTPException(status_code=404, detail="No tasks found to delete")
+        return {"message": "No tasks found to delete"}
 
+@router.post("/chat_with_gpt3_turbo")
+async def chat_with_gpt3_turbo(user_name: str, user_input: str = Form(...)):
+    try:
+        # Use OpenAI GPT-3.5-turbo to get assistant's response
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": user_input},
+            ]
+        )
 
-app.include_router(router)
+        gpt3_turbo_response = response['choices'][0]['message']['content'].strip()
+
+        return {'success': True, 'response': gpt3_turbo_response}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
+
+# Include the router in the main app
+app.include_router(router, prefix="/tasks")
