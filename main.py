@@ -11,7 +11,6 @@ import os
 app = FastAPI()
 
 # Set your OpenAI API key as an environment variable
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.on_event("startup")
 async def startup_event():
@@ -143,23 +142,7 @@ async def delete_all_tasks(user_name: str):
     else:
         return {"message": "No tasks found to delete"}
 
-@router.post("/chat_with_gpt3_turbo")
-async def chat_with_gpt3_turbo(user_name: str, user_input: str = Form(...)):
-    try:
-        # Use OpenAI GPT-3.5-turbo to get assistant's response
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": user_input},
-            ]
-        )
 
-        gpt3_turbo_response = response['choices'][0]['message']['content'].strip()
-
-        return {'success': True, 'response': gpt3_turbo_response}
-    except Exception as e:
-        return {'success': False, 'error': str(e)}
 
 # Include the router in the main app
 app.include_router(router, prefix="/tasks")
