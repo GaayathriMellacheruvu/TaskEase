@@ -6,10 +6,12 @@ from bson import ObjectId
 from pydantic import BaseModel
 import openai
 from typing import List, Dict, Union
+import os
 
 app = FastAPI()
 
-openai.api_key = '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'
+# Set your OpenAI API key as an environment variable
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.on_event("startup")
 async def startup_event():
