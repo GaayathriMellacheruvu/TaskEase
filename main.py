@@ -9,7 +9,7 @@ from typing import List, Dict, Union
 
 app = FastAPI()
 
-openai.api_key = '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'
+openai.api_key = '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'
 
 @app.on_event("startup")
 async def startup_event():
