@@ -1,10 +1,9 @@
-from fastapi import FastAPI, APIRouter, Form
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
 from pydantic import BaseModel
-import openai
 from typing import List, Dict, Union
 import os
 
@@ -24,7 +23,7 @@ def get_collection_name():
 router = APIRouter()
 
 # Add CORS middleware
-origins = ["*"]  # Change this to your frontend's actual domain in production
+origins = ["https://task-ease-7f6t.onrender.com"]  # Change this to your frontend's actual domain in production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
