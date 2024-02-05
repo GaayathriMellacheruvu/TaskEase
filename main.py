@@ -1,10 +1,10 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 app = FastAPI()
 
@@ -75,7 +75,9 @@ async def delete_task(task_id: str, user_name: str):
             return {"message": f"Successfully deleted data with ObjectId: {task_id}"}
         else:
             raise HTTPException(status_code=404, detail=f"No data found with ObjectId: {task_id}")
+    except ValidationError as ve:
+        raise HTTPException(status_code=400, detail=f"Validation Error: {ve.errors()}")
     except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 app.include_router(router)
