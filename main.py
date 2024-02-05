@@ -29,14 +29,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class TaskUpdate(BaseModel):
-    task_text: str
-
-
 class TaskCreate(BaseModel):
     task_text: str
-
-
 
 @router.post("/add_task/")
 async def add_task(task_data: TaskCreate, user_name: str):
@@ -83,58 +77,5 @@ async def delete_task(task_id: str, user_name: str):
             raise HTTPException(status_code=404, detail=f"No data found with ObjectId: {task_id}")
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ObjectId format. Please enter a valid ObjectId.")
-
-@router.put("/update_task/{task_id}/")
-async def update_task(task_id: str, task_data: TaskUpdate, user_name: str):
-    collection_name = get_collection_name()
-    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
-    db = client[user_name]
-    collection = db[collection_name]
-
-    try:
-        # Convert the input string to ObjectId
-        obj_id = ObjectId(task_id)
-        result = collection.update_one({"_id": obj_id}, {"$set": {"task_text": task_data.task_text}})
-
-        if result.modified_count > 0:
-            return {"message": f"Successfully updated task with ObjectId: {task_id}"}
-        else:
-            return {"message": f"No data found with ObjectId: {task_id}"}
-    except Exception as e:
-        return {"message": "Invalid ObjectId format. Please enter a valid ObjectId."}
-
-@router.get("/get_task/{task_id}/")
-async def get_task(task_id: str, user_name: str):
-    collection_name = get_collection_name()
-    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
-    db = client[user_name]
-    collection = db[collection_name]
-
-    try:
-        # Convert the input string to ObjectId
-        obj_id = ObjectId(task_id)
-        task = collection.find_one({"_id": obj_id}, {"_id": 1, "task_text": 1})
-
-        if task:
-            task["_id"] = str(task["_id"])
-            return {"task": task}
-        else:
-            return {"message": f"No data found with ObjectId: {task_id}"}
-    except Exception as e:
-        return {"message": "Invalid ObjectId format. Please enter a valid ObjectId."}
-
-@router.delete("/delete_all_tasks/")
-async def delete_all_tasks(user_name: str):
-    collection_name = get_collection_name()
-    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
-    db = client[user_name]
-    collection = db[collection_name]
-
-    result = collection.delete_many({})
-
-    if result.deleted_count > 0:
-        return {"message": "All tasks deleted successfully"}
-    else:
-        return {"message": "No tasks found to delete"}
 
 app.include_router(router)
