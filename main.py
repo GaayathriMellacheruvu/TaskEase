@@ -20,7 +20,7 @@ def get_collection_name():
 router = APIRouter()
 
 # Add CORS middleware
-origins = ["*"]  # Change this to your frontend's actual domain in production
+origins = ["https://task-ease-wv50.onrender.com"]  # Change this to your frontend's actual domain in production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
