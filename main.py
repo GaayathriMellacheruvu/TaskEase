@@ -32,9 +32,6 @@ app.add_middleware(
 class TaskUpdate(BaseModel):
     task_text: str
 
-class TaskResponse(BaseModel):
-    task_id: str
-    task_text: str
 
 class TaskCreate(BaseModel):
     task_text: str
