@@ -29,8 +29,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class TaskUpdate(BaseModel):
+    task_text: str
+
+class TaskResponse(BaseModel):
+    task_id: str
+    task_text: str
+
 class TaskCreate(BaseModel):
     task_text: str
+
+
 
 @router.post("/add_task/")
 async def add_task(task_data: TaskCreate, user_name: str):
