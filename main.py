@@ -4,13 +4,11 @@ from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
 from pydantic import BaseModel
-from typing import List, Dict, Union
 
 app = FastAPI()
 
 @app.on_event("startup")
 async def startup_event():
-    # Add your startup initialization code here
     pass
 
 def get_collection_name():
@@ -20,7 +18,7 @@ def get_collection_name():
 router = APIRouter()
 
 # Add CORS middleware
-origins = ["https://task-ease-wv50.onrender.com"]  # Change this to your frontend's actual domain in production
+origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -30,10 +28,6 @@ app.add_middleware(
 )
 
 class TaskUpdate(BaseModel):
-    task_text: str
-
-class TaskResponse(BaseModel):
-    task_id: str
     task_text: str
 
 class TaskCreate(BaseModel):
@@ -60,30 +54,10 @@ async def list_tasks(user_name: str):
 
     tasks = list(collection.find({}, {"_id": 1, "task_text": 1}))
 
-    # Convert ObjectId to string
     for task in tasks:
         task["_id"] = str(task["_id"])
 
     return {"tasks": tasks}
-
-@router.delete("/delete_task/{task_id}/")
-async def delete_task(task_id: str, user_name: str):
-    collection_name = get_collection_name()
-    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
-    db = client[user_name]
-    collection = db[collection_name]
-
-    try:
-        # Convert the input string to ObjectId
-        obj_id = ObjectId(task_id)
-        result = collection.delete_one({"_id": obj_id})
-
-        if result.deleted_count > 0:
-            return {"message": f"Successfully deleted data with ObjectId: {task_id}"}
-        else:
-            return {"message": f"No data found with ObjectId: {task_id}"}
-    except Exception as e:
-        return {"message": "Invalid ObjectId format. Please enter a valid ObjectId."}
 
 @router.put("/update_task/{task_id}/")
 async def update_task(task_id: str, task_data: TaskUpdate, user_name: str):
@@ -93,12 +67,29 @@ async def update_task(task_id: str, task_data: TaskUpdate, user_name: str):
     collection = db[collection_name]
 
     try:
-        # Convert the input string to ObjectId
         obj_id = ObjectId(task_id)
         result = collection.update_one({"_id": obj_id}, {"$set": {"task_text": task_data.task_text}})
 
         if result.modified_count > 0:
             return {"message": f"Successfully updated task with ObjectId: {task_id}"}
+        else:
+            return {"message": f"No data found with ObjectId: {task_id}"}
+    except Exception as e:
+        return {"message": "Invalid ObjectId format. Please enter a valid ObjectId."}
+
+@router.delete("/delete_task/{task_id}/")
+async def delete_task(task_id: str, user_name: str):
+    collection_name = get_collection_name()
+    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
+    db = client[user_name]
+    collection = db[collection_name]
+
+    try:
+        obj_id = ObjectId(task_id)
+        result = collection.delete_one({"_id": obj_id})
+
+        if result.deleted_count > 0:
+            return {"message": f"Successfully deleted data with ObjectId: {task_id}"}
         else:
             return {"message": f"No data found with ObjectId: {task_id}"}
     except Exception as e:
@@ -112,7 +103,6 @@ async def get_task(task_id: str, user_name: str):
     collection = db[collection_name]
 
     try:
-        # Convert the input string to ObjectId
         obj_id = ObjectId(task_id)
         task = collection.find_one({"_id": obj_id}, {"_id": 1, "task_text": 1})
 
@@ -124,19 +114,4 @@ async def get_task(task_id: str, user_name: str):
     except Exception as e:
         return {"message": "Invalid ObjectId format. Please enter a valid ObjectId."}
 
-@router.delete("/delete_all_tasks/")
-async def delete_all_tasks(user_name: str):
-    collection_name = get_collection_name()
-    client = MongoClient(f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{user_name}")
-    db = client[user_name]
-    collection = db[collection_name]
-
-    result = collection.delete_many({})
-
-    if result.deleted_count > 0:
-        return {"message": "All tasks deleted successfully"}
-    else:
-        return {"message": "No tasks found to delete"}
-
-# Include the router in the main app
 app.include_router(router, prefix="/tasks")
