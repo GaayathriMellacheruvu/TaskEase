@@ -144,20 +144,43 @@ async def update_task_api(user_name: str, task_id: str, task_data: TaskUpdate = 
         return {"message": str(e)}
 
 @router.post("/chat_with_gpt3_turbo")
-async def chat_with_gpt3_turbo_api(user_name: str, user_input: str = Form(...), collection_name: str = None):
-    # Validate user authentication
-    if not validate_user(user_name):
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    
-    if not collection_name:
-        collection_name = get_collection_name()
-    
+async def chat_with_gpt3_turbo(username, collection_name, user_input):
     try:
-        # Call chat_with_gpt3_turbo function
-        response = chat_with_gpt3_turbo(user_name, collection_name, user_input)
-        return response
+        # Initialize a list to store conversation history
+        conversation_history = []
+
+        # Append username and collection name to conversation history
+        conversation_history.append({"role": "user", "content": f"User: {username}"})
+        conversation_history.append({"role": "user", "content": f"Collection: {collection_name}"})
+
+        # Append user input to conversation history
+        conversation_history.append({"role": "user", "content": user_input})
+
+        # Use OpenAI GPT-3.5-turbo to get assistant's response
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                *conversation_history  # Include conversation history
+            ]
+        )
+
+        # Extract the response from the API result
+        gpt3_turbo_response = response['choices'][0]['message']['content'].strip()
+
+        # Log the response
+        print("GPT-3.5-turbo Response:", gpt3_turbo_response)
+
+        # Return the AI response
+        return {"message": "GPT-3.5-turbo:", "response": gpt3_turbo_response}
+
     except Exception as e:
-        return {"message": str(e)}
+        # Log the error
+        print("Error:", e)
+
+        # Return error message if there's an exception
+        return {"message": "Error:", "error": str(e)}
+
 
 @router.delete("/delete_all_tasks/")
 async def delete_all_tasks_api(user_name: str, collection_name: str = None):
