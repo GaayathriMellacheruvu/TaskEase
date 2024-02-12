@@ -49,6 +49,7 @@ class TaskUpdate(BaseModel):
 class TaskResponse(BaseModel):
     task_id: str
     task_text: str
+    created_at: datetime
 
 # Define user model for authentication
 class User(BaseModel):
@@ -74,7 +75,7 @@ async def register(user: User):
     return {"message": "User registered successfully"}
 
 @router.post("/add_task/")
-async def add_task_api(user_name: str, task_data: TaskCreate = Form(...), collection_name: str = None):
+async def add_task_api(user_name: str, task_data: TaskCreate, collection_name: str = None):
     # Validate user authentication
     if not validate_user(user_name):
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -125,7 +126,7 @@ async def delete_task_api(user_name: str, task_id: str, collection_name: str = N
         return {"message": str(e)}
 
 @router.put("/update_task/{task_id}/")
-async def update_task_api(user_name: str, task_id: str, task_data: TaskUpdate = Form(...), collection_name: str = None):
+async def update_task_api(user_name: str, task_id: str, task_data: TaskUpdate, collection_name: str = None):
     # Validate user authentication
     if not validate_user(user_name):
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -144,7 +145,7 @@ async def update_task_api(user_name: str, task_id: str, task_data: TaskUpdate = 
         return {"message": str(e)}
 
 @router.post("/chat_with_gpt3_turbo")
-async def chat_with_gpt3_turbo(username, collection_name, user_input):
+async def chat_with_gpt3_turbo(username: str, collection_name: str, user_input: str = Form(...)):
     try:
         # Initialize a list to store conversation history
         conversation_history = []
@@ -222,9 +223,28 @@ def create_new_user(username):
     db[current_month].insert_one({})  # Insert an empty document to create the collection
 
     return db
+
+# Function to add a task with current timestamp
 def add_task(username, collection_name, task_text):
+    # Get the current timestamp
+    current_time = datetime.now()
+
     # Implement logic to add a task to the MongoDB database
-    pass
+    # For example, you can create a dictionary representing the task
+    task = {
+        "task_text": task_text,
+        "created_at": current_time  # Include the current timestamp as an attribute
+    }
+
+    # Insert the task into the collection
+    collection = get_collection(username, collection_name)
+    result = collection.insert_one(task)
+
+    # Return the inserted task ID
+    return result.inserted_id
+
+# Implement the remaining functions: delete_task, list_tasks, update_task, and chat_with_gpt3_turbo
+# (Note: Implement these functions according to your requirements)
 
 def delete_task(username, collection_name, task_id):
     # Implement logic to delete a task from the MongoDB database
@@ -234,9 +254,11 @@ def list_tasks(username, collection_name):
     # Implement logic to list tasks from the MongoDB database
     pass
 
+def update_task(username, collection_name, task_id, updated_text):
+    # Implement logic to update a task in the MongoDB database
+    pass
+
 def chat_with_gpt3_turbo(username, collection_name, user_input):
     # Implement logic to interact with OpenAI GPT-3.5-turbo
     pass
 
-def update_task(username, collection_name,task_id):
-    pass
