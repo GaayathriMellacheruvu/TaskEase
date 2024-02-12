@@ -4,13 +4,15 @@ from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
 from pydantic import BaseModel
-from demo import (
-    chat_with_gpt3_turbo,
-    add_task,
-    list_tasks,
-    update_task,
-    delete_task,
-)
+import openai
+from dotenv import load_dotenv
+import os
+
+# Load environment variables
+load_dotenv()
+
+# Set up OpenAI API
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
 
@@ -81,7 +83,7 @@ async def add_task_api(user_name: str, task_data: TaskCreate = Form(...), collec
         collection_name = get_collection_name()
     
     try:
-        # Call add_task function from demo.py
+        # Call add_task function
         task_id = add_task(user_name, collection_name, task_data.task_text)
         return {"message": "Task added successfully", "task_id": str(task_id)}
     except Exception as e:
@@ -97,7 +99,7 @@ async def list_tasks_api(user_name: str, collection_name: str = None):
         collection_name = get_collection_name()
     
     try:
-        # Call list_tasks function from demo.py
+        # Call list_tasks function
         tasks = list_tasks(user_name, collection_name)
         return {"tasks": tasks}
     except Exception as e:
@@ -113,7 +115,7 @@ async def delete_task_api(user_name: str, task_id: str, collection_name: str = N
         collection_name = get_collection_name()
     
     try:
-        # Call delete_task function from demo.py
+        # Call delete_task function
         deleted_count = delete_task(user_name, collection_name, task_id)
         if deleted_count > 0:
             return {"message": f"Successfully deleted data with ObjectId: {task_id}"}
@@ -132,7 +134,7 @@ async def update_task_api(user_name: str, task_id: str, task_data: TaskUpdate = 
         collection_name = get_collection_name()
     
     try:
-        # Call update_task function from demo.py
+        # Call update_task function
         updated_count = update_task(user_name, collection_name, task_id, task_data.task_text)
         if updated_count > 0:
             return {"message": f"Successfully updated task with ObjectId: {task_id}"}
@@ -151,7 +153,7 @@ async def chat_with_gpt3_turbo_api(user_name: str, user_input: str = Form(...), 
         collection_name = get_collection_name()
     
     try:
-        # Call chat_with_gpt3_turbo function from demo.py
+        # Call chat_with_gpt3_turbo function
         response = chat_with_gpt3_turbo(user_name, collection_name, user_input)
         return response
     except Exception as e:
@@ -197,3 +199,21 @@ def create_new_user(username):
     db[current_month].insert_one({})  # Insert an empty document to create the collection
 
     return db
+def add_task(username, collection_name, task_text):
+    # Implement logic to add a task to the MongoDB database
+    pass
+
+def delete_task(username, collection_name, task_id):
+    # Implement logic to delete a task from the MongoDB database
+    pass
+
+def list_tasks(username, collection_name):
+    # Implement logic to list tasks from the MongoDB database
+    pass
+
+def chat_with_gpt3_turbo(username, collection_name, user_input):
+    # Implement logic to interact with OpenAI GPT-3.5-turbo
+    pass
+
+def update_task(username, collection_name,task_id):
+    pass
