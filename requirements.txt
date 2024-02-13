@@ -5,3 +5,4 @@ dnspython==2.1.0  # Required for MongoDB SRV URIs
 openai
 python-dotenv
 python-multipart
+pytz
