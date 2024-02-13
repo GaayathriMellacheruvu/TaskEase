@@ -7,6 +7,7 @@ from pydantic import BaseModel
 import openai
 from dotenv import load_dotenv
 import os
+import pytz
 
 # Load environment variables
 load_dotenv()
@@ -224,16 +225,20 @@ def create_new_user(username):
 
     return db
 
-# Function to add a task with current timestamp
+# Function to add a task with current timestamp in IST timezone
 def add_task(username, collection_name, task_text):
-    # Get the current timestamp
-    current_time = datetime.now()
+    # Get the current UTC timestamp
+    current_time_utc = datetime.utcnow()
+
+    # Convert UTC to IST
+    ist_timezone = pytz.timezone('Asia/Kolkata')
+    current_time_ist = current_time_utc.astimezone(ist_timezone)
 
     # Implement logic to add a task to the MongoDB database
     # For example, you can create a dictionary representing the task
     task = {
         "task_text": task_text,
-        "created_at": current_time  # Include the current timestamp as an attribute
+        "created_at": current_time_ist  # Include the current timestamp in IST
     }
 
     # Insert the task into the collection
@@ -261,4 +266,3 @@ def update_task(username, collection_name, task_id, updated_text):
 def chat_with_gpt3_turbo(username, collection_name, user_input):
     # Implement logic to interact with OpenAI GPT-3.5-turbo
     pass
-
