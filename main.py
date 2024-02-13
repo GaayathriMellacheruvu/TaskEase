@@ -7,7 +7,6 @@ from pydantic import BaseModel
 import openai
 from dotenv import load_dotenv
 import os
-import pytz
 
 # Load environment variables
 load_dotenv()
@@ -225,20 +224,13 @@ def create_new_user(username):
 
     return db
 
-# Function to add a task with current timestamp in IST timezone
+# Function to add a task with current timestamp
 def add_task(username, collection_name, task_text):
-    # Get the current UTC timestamp
-    current_time_utc = datetime.utcnow()
-
-    # Convert UTC to IST
-    ist_timezone = pytz.timezone('Asia/Kolkata')
-    current_time_ist = current_time_utc.astimezone(ist_timezone)
-
     # Implement logic to add a task to the MongoDB database
     # For example, you can create a dictionary representing the task
     task = {
         "task_text": task_text,
-        "created_at": current_time_ist  # Include the current timestamp in IST
+        "created_at": datetime.now()  # Include the current timestamp
     }
 
     # Insert the task into the collection
@@ -248,21 +240,25 @@ def add_task(username, collection_name, task_text):
     # Return the inserted task ID
     return result.inserted_id
 
-# Implement the remaining functions: delete_task, list_tasks, update_task, and chat_with_gpt3_turbo
-# (Note: Implement these functions according to your requirements)
-
-def delete_task(username, collection_name, task_id):
-    # Implement logic to delete a task from the MongoDB database
-    pass
-
+# Function to list tasks
 def list_tasks(username, collection_name):
     # Implement logic to list tasks from the MongoDB database
-    pass
+    collection = get_collection(username, collection_name)
+    tasks = list(collection.find({}, {"_id": 1, "task_text": 1, "created_at": 1}))
+    formatted_tasks = [{"task_id": str(task["_id"]), "task_text": task["task_text"], "created_at": task["created_at"]} for task in tasks]
+    return formatted_tasks
 
+# Function to delete a task
+def delete_task(username, collection_name, task_id):
+    # Implement logic to delete a task from the MongoDB database
+    collection = get_collection(username, collection_name)
+    result = collection.delete_one({"_id": ObjectId(task_id)})
+    return result.deleted_count
+
+# Function to update a task
 def update_task(username, collection_name, task_id, updated_text):
     # Implement logic to update a task in the MongoDB database
-    pass
+    collection = get_collection(username, collection_name)
+    result = collection.update_one({"_id": ObjectId(task_id)}, {"$set": {"task_text": updated_text}})
+    return result.modified_count
 
-def chat_with_gpt3_turbo(username, collection_name, user_input):
-    # Implement logic to interact with OpenAI GPT-3.5-turbo
-    pass
