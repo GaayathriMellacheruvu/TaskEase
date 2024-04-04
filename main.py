@@ -28,28 +28,22 @@ app.add_middleware(
 
 router = APIRouter()
 
-# MongoDB connection details
-def get_collection_name():
-    return datetime.now().strftime("%B").lower()
+# MongoDB connection
+mongo_uri = os.getenv("MONGODB_URI")
+if not mongo_uri:
+    raise EnvironmentError("MongoDB URI not found in environment variables.")
 
-def get_collection(username, collection_name):
-    mongo_uri = f"mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/{username}"
-    client = MongoClient(mongo_uri)
-    db = client[username]
-    collection = db[collection_name]
-    return collection
+client = MongoClient(mongo_uri)
 
 # Define data models
 class TaskCreate(BaseModel):
-    task_text: str
-
-class TaskUpdate(BaseModel):
     task_text: str
 
 class TaskResponse(BaseModel):
     task_id: str
     task_text: str
     created_at: datetime
+    priority: str
 
 # Define user model for authentication
 class User(BaseModel):
@@ -88,7 +82,7 @@ async def add_task_api(user_name: str, task_data: TaskCreate, collection_name: s
         task_id = add_task(user_name, collection_name, task_data.task_text)
         return {"message": "Task added successfully", "task_id": str(task_id)}
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Failed to add task", "error": str(e)}
 
 @router.get("/list_tasks/")
 async def list_tasks_api(user_name: str, collection_name: str = None):
@@ -104,7 +98,7 @@ async def list_tasks_api(user_name: str, collection_name: str = None):
         tasks = list_tasks(user_name, collection_name)
         return {"tasks": tasks}
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Failed to list tasks", "error": str(e)}
 
 @router.delete("/delete_task/{task_id}/")
 async def delete_task_api(user_name: str, task_id: str, collection_name: str = None):
@@ -123,10 +117,10 @@ async def delete_task_api(user_name: str, task_id: str, collection_name: str = N
         else:
             return {"message": f"No data found with ObjectId: {task_id}"}
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Failed to delete task", "error": str(e)}
 
 @router.put("/update_task/{task_id}/")
-async def update_task_api(user_name: str, task_id: str, task_data: TaskUpdate, collection_name: str = None):
+async def update_task_api(user_name: str, task_id: str, task_data: TaskCreate, collection_name: str = None):
     # Validate user authentication
     if not validate_user(user_name):
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -142,38 +136,37 @@ async def update_task_api(user_name: str, task_id: str, task_data: TaskUpdate, c
         else:
             return {"message": f"No data found with ObjectId: {task_id}"}
     except Exception as e:
-        return {"message": str(e)}
-
+        return {"message": "Failed to update task", "error": str(e)}
 @router.post("/chat_with_gpt3_turbo")
 async def chat_with_gpt3_turbo(username: str, collection_name: str, user_input: str = Form(...)):
     try:
-        # Initialize a list to store conversation history
-        conversation_history = []
-
-        # Append username and collection name to conversation history
-        conversation_history.append({"role": "user", "content": f"User: {username}"})
-        conversation_history.append({"role": "user", "content": f"Collection: {collection_name}"})
-
-        # Append user input to conversation history
-        conversation_history.append({"role": "user", "content": user_input})
+        if user_input.startswith("Add new task:"):
+            task_text = user_input.replace("Add new task:", "").strip()
+            priority = suggest_priority(task_text)
+            task_id = add_task(username, collection_name, task_text, priority)
+            return {"message": "Task added successfully", "task_id": str(task_id)}
 
         # Use OpenAI GPT-3.5-turbo to get assistant's response
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
-                *conversation_history  # Include conversation history
+                {"role": "user", "content": f"User: {username}"},
+                {"role": "user", "content": f"Collection: {collection_name}"},
+                {"role": "user", "content": user_input}
             ]
         )
 
         # Extract the response from the API result
         gpt3_turbo_response = response['choices'][0]['message']['content'].strip()
 
+        # Save user input and GPT-3 response to the conversation
+        save_user_input_response(username, collection_name, user_input, gpt3_turbo_response)
+
         # Log the response
         print("GPT-3.5-turbo Response:", gpt3_turbo_response)
 
-        # Return the AI response
-        return {"message": "GPT-3.5-turbo:", "response": gpt3_turbo_response}
+        return {"message": gpt3_turbo_response}
 
     except Exception as e:
         # Log the error
@@ -182,26 +175,45 @@ async def chat_with_gpt3_turbo(username: str, collection_name: str, user_input: 
         # Return error message if there's an exception
         return {"message": "Error:", "error": str(e)}
 
+def save_user_input_response(username, collection_name, user_input, response):
+    try:
+        # Get the conversation collection
+        collection = get_collection(username, collection_name)
+        
+        # Create a document representing the user input, response, and timestamp
+        document = {
+            "user_input": user_input,
+            "response": response,
+            "created_at": datetime.now()
+        }
+        
+        # Insert the document into the conversation collection
+        collection.insert_one(document)
+        
+    except Exception as e:
+        # Log the error
+        print("Error saving user input and response:", e)
 
-@router.delete("/delete_all_tasks/")
-async def delete_all_tasks_api(user_name: str, collection_name: str = None):
+@router.get("/collections/")
+async def get_collections(username: str):
     # Validate user authentication
-    if not validate_user(user_name):
+    if not validate_user(username):
         raise HTTPException(status_code=401, detail="Unauthorized")
     
-    if not collection_name:
-        collection_name = get_collection_name()
-    
     try:
-        # Connect to the database and drop the entire collection
-        collection = get_collection(user_name, collection_name)
-        collection.drop()
-        return {"message": "All tasks deleted successfully"}
+        # Get the list of collections for the user
+        collections = get_collections_list(username)
+        return {"collections": collections}
     except Exception as e:
-        return {"message": str(e)}
+        return {"message": "Failed to fetch collections", "error": str(e)}
 
-# Include the router in the main app
-app.include_router(router, prefix="/tasks")
+def get_collections_list(username):
+    # Get all database names for the user
+    database_names = client.list_database_names()
+    # Filter out system databases and return remaining as collections
+    collections = [db_name for db_name in database_names if db_name not in ['admin', 'local', 'config', 'system']]
+    return collections
+
 
 # Function to validate user
 def validate_user(username):
@@ -211,54 +223,61 @@ def validate_user(username):
     database_names = client.list_database_names()
     return username in database_names
 
-# Function to create a new user (create a new database with the provided username)
-def create_new_user(username):
-    # Implement your logic here to create a new database with the provided username
-    mongo_uri = "mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/"
-    client = MongoClient(mongo_uri)
-    db = client[username]  # Create a new database with the provided username
-    
-    # Create an empty collection for the current month
-    current_month = get_collection_name()
-    db[current_month].insert_one({})  # Insert an empty document to create the collection
 
-    return db
+def get_collection_name():
+    return datetime.now().strftime("%B").lower()
 
-# Function to add a task with current timestamp
-def add_task(username, collection_name, task_text):
-    # Implement logic to add a task to the MongoDB database
-    # For example, you can create a dictionary representing the task
+def get_collection(username, collection_name):
+    db = client[username]
+    return db[collection_name]
+
+def add_task(username, collection_name, task_text, priority="Low"):
+    collection = get_collection(username, collection_name)
     task = {
         "task_text": task_text,
-        "created_at": datetime.now()  # Include the current timestamp
+        "priority": priority,
+        "created_at": datetime.now()
     }
-
-    # Insert the task into the collection
-    collection = get_collection(username, collection_name)
     result = collection.insert_one(task)
-
-    # Return the inserted task ID
     return result.inserted_id
 
-# Function to list tasks
+def suggest_priority(task_text):
+    task_text_lower = task_text.lower()
+    high_priority_keywords = ["urgent", "important", "asap", "critical"]
+    medium_priority_keywords = ["tomorrow", "soon", "schedule"]
+    for keyword in high_priority_keywords:
+        if keyword in task_text_lower:
+            return "High"
+    for keyword in medium_priority_keywords:
+        if keyword in task_text_lower:
+            return "Medium"
+    return "Low"
+
+def validate_user(username):
+    database_names = client.list_database_names()
+    return username in database_names
+
+def create_new_user(username):
+    db = client[username]
+    current_month = get_collection_name()
+    db[current_month].insert_one({})
+    return db
+
 def list_tasks(username, collection_name):
-    # Implement logic to list tasks from the MongoDB database
     collection = get_collection(username, collection_name)
-    tasks = list(collection.find({}, {"_id": 1, "task_text": 1, "created_at": 1}))
-    formatted_tasks = [{"task_id": str(task["_id"]), "task_text": task["task_text"], "created_at": task["created_at"]} for task in tasks]
+    tasks = list(collection.find({}, {"_id": 1, "task_text": 1, "created_at": 1, "priority": 1}))
+    formatted_tasks = [{"task_id": str(task["_id"]), "task_text": task["task_text"], "created_at": task["created_at"], "priority": task["priority"]} for task in tasks]
     return formatted_tasks
 
-# Function to delete a task
 def delete_task(username, collection_name, task_id):
-    # Implement logic to delete a task from the MongoDB database
     collection = get_collection(username, collection_name)
     result = collection.delete_one({"_id": ObjectId(task_id)})
     return result.deleted_count
 
-# Function to update a task
 def update_task(username, collection_name, task_id, updated_text):
-    # Implement logic to update a task in the MongoDB database
     collection = get_collection(username, collection_name)
     result = collection.update_one({"_id": ObjectId(task_id)}, {"$set": {"task_text": updated_text}})
     return result.modified_count
 
+# Include the router in the main app
+app.include_router(router, prefix="/tasks")
