@@ -82,9 +82,9 @@ async def add_task_api(user_name: str, task_data: TaskCreate, collection_name: s
         return {"message": "Failed to add task", "error": str(e)}
 
 @router.get("/list_tasks/")
-async def list_tasks_api(user_name: str, collection_name: str = None):
+async def list_tasks_api(username: str, collection_name: str = None):
     # Validate user authentication
-    if not validate_user(user_name):
+    if not validate_user(username):
         raise HTTPException(status_code=401, detail="Unauthorized")
     
     if not collection_name:
@@ -92,7 +92,7 @@ async def list_tasks_api(user_name: str, collection_name: str = None):
     
     try:
         # Call list_tasks function
-        tasks = list_tasks(user_name, collection_name)
+        tasks = list_tasks(username, collection_name)
         return {"tasks": tasks}
     except Exception as e:
         return {"message": "Failed to list tasks", "error": str(e)}
@@ -191,7 +191,7 @@ def save_user_input_response(username, collection_name, user_input, response):
     except Exception as e:
         # Log the error
         print("Error saving user input and response:", e)
-        
+
 @router.get("/collections/{username}")
 async def get_collections(username: str):
     # Validate user authentication
@@ -273,8 +273,17 @@ def create_new_user(username):
 
 def list_tasks(username, collection_name):
     collection = get_collection(username, collection_name)
+    # Use projection to include only fields that are present in the document
     tasks = list(collection.find({}, {"_id": 1, "task_text": 1, "created_at": 1, "priority": 1}))
-    formatted_tasks = [{"task_id": str(task["_id"]), "task_text": task["task_text"], "created_at": task["created_at"], "priority": task["priority"]} for task in tasks]
+    formatted_tasks = []
+    for task in tasks:
+        formatted_task = {
+            "task_id": str(task["_id"]),
+            "task_text": task.get("task_text", ""),
+            "created_at": task.get("created_at", ""),  # Use .get() method to handle missing field
+            "priority": task.get("priority", "")
+        }
+        formatted_tasks.append(formatted_task)
     return formatted_tasks
 
 def delete_task(username, collection_name, task_id):
