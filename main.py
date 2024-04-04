@@ -13,7 +13,7 @@ import datefinder
 load_dotenv()
 
 # Set up OpenAI API
-openai.api_key = "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"
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
 
