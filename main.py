@@ -7,6 +7,7 @@ from pydantic import BaseModel
 import openai
 from dotenv import load_dotenv
 import os
+import datefinder
 
 # Load environment variables
 load_dotenv()
@@ -41,6 +42,8 @@ class TaskResponse(BaseModel):
     task_text: str
     created_at: datetime
     priority: str
+    date: str
+    time: str
 
 # Define user model for authentication
 class User(BaseModel):
@@ -240,10 +243,22 @@ def get_collection(username, collection_name):
     return db[collection_name]
 
 def add_task(username, collection_name, task_text, priority="Low"):
+    # Parse date and time from task text
+    date_matches = datefinder.find_dates(task_text)
+    date_str = None
+    time_str = None
+    if date_matches:
+        for match in date_matches:
+            date_str = match.strftime("%Y-%m-%d")
+            time_str = match.strftime("%H:%M:%S")
+            break
+
     collection = get_collection(username, collection_name)
     task = {
         "task_text": task_text,
         "priority": priority,
+        "date": date_str,
+        "time": time_str,
         "created_at": datetime.now()
     }
     result = collection.insert_one(task)
@@ -274,14 +289,16 @@ def create_new_user(username):
 def list_tasks(username, collection_name):
     collection = get_collection(username, collection_name)
     # Use projection to include only fields that are present in the document
-    tasks = list(collection.find({}, {"_id": 1, "task_text": 1, "created_at": 1, "priority": 1}))
+    tasks = list(collection.find({}, {"_id": 1, "task_text": 1, "created_at": 1, "priority": 1, "date": 1, "time": 1}))
     formatted_tasks = []
     for task in tasks:
         formatted_task = {
             "task_id": str(task["_id"]),
             "task_text": task.get("task_text", ""),
-            "created_at": task.get("created_at", ""),  # Use .get() method to handle missing field
-            "priority": task.get("priority", "")
+            "priority": task.get("priority", ""),
+            "date": task.get("date", ""),
+            "time": task.get("time", ""),
+            "created_at": task.get("created_at", "")  # Use .get() method to handle missing field
         }
         formatted_tasks.append(formatted_task)
     return formatted_tasks
