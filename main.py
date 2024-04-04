@@ -29,7 +29,7 @@ app.add_middleware(
 router = APIRouter()
 
 # MongoDB connection
-mongo_uri = os.getenv("MONGODB_URI")
+mongo_uri = os.getenv("mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/")
 if not mongo_uri:
     raise EnvironmentError("MongoDB URI not found in environment variables.")
 
