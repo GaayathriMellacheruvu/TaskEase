@@ -29,10 +29,7 @@ app.add_middleware(
 router = APIRouter()
 
 # MongoDB connection
-mongo_uri = os.getenv("mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/")
-if not mongo_uri:
-    raise EnvironmentError("MongoDB URI not found in environment variables.")
-
+mongo_uri = "mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/"
 client = MongoClient(mongo_uri)
 
 # Define data models
@@ -137,6 +134,7 @@ async def update_task_api(user_name: str, task_id: str, task_data: TaskCreate, c
             return {"message": f"No data found with ObjectId: {task_id}"}
     except Exception as e:
         return {"message": "Failed to update task", "error": str(e)}
+
 @router.post("/chat_with_gpt3_turbo")
 async def chat_with_gpt3_turbo(username: str, collection_name: str, user_input: str = Form(...)):
     try:
@@ -193,16 +191,17 @@ def save_user_input_response(username, collection_name, user_input, response):
     except Exception as e:
         # Log the error
         print("Error saving user input and response:", e)
-
-@router.get("/collections/")
+        
+@router.get("/collections/{username}")
 async def get_collections(username: str):
     # Validate user authentication
     if not validate_user(username):
         raise HTTPException(status_code=401, detail="Unauthorized")
-    
+
     try:
         # Get the list of collections for the user
-        collections = get_collections_list(username)
+        database = client[username]
+        collections = database.list_collection_names()
         return {"collections": collections}
     except Exception as e:
         return {"message": "Failed to fetch collections", "error": str(e)}
@@ -214,6 +213,16 @@ def get_collections_list(username):
     collections = [db_name for db_name in database_names if db_name not in ['admin', 'local', 'config', 'system']]
     return collections
 
+def get_databases_list(username):
+    # Get all collections for the user
+    collections = get_collections_list(username)
+    databases = {}
+    # Iterate through each collection and get its databases
+    for collection_name in collections:
+        db = client[username]
+        collection = db[collection_name]
+        databases[collection_name] = collection.list_collection_names()
+    return databases
 
 # Function to validate user
 def validate_user(username):
@@ -222,7 +231,6 @@ def validate_user(username):
     client = MongoClient(mongo_uri)
     database_names = client.list_database_names()
     return username in database_names
-
 
 def get_collection_name():
     return datetime.now().strftime("%B").lower()
