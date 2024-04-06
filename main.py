@@ -36,6 +36,9 @@ client = MongoClient(mongo_uri)
 # Define data models
 class TaskCreate(BaseModel):
     task_text: str
+    priority: str
+    date: str
+    time: str
 
 class TaskResponse(BaseModel):
     task_id: str
@@ -100,37 +103,43 @@ async def list_tasks_api(username: str, collection_name: str = None):
     except Exception as e:
         return {"message": "Failed to list tasks", "error": str(e)}
 
-@router.delete("/delete_task/{task_id}/")
-async def delete_task_api(user_name: str, task_id: str, collection_name: str = None):
-    # Validate user authentication
-    if not validate_user(user_name):
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    
-    if not collection_name:
-        collection_name = get_collection_name()
-    
+@router.delete("/delete_task/")
+async def delete_task_api(username: str, task_id: str, collection_name: str = None):
     try:
+        # Validate user authentication
+        if not validate_user(username):
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
+        if not collection_name:
+            collection_name = get_collection_name()
+
         # Call delete_task function
-        deleted_count = delete_task(user_name, collection_name, task_id)
+        deleted_count = delete_task(username, collection_name, task_id)
         if deleted_count > 0:
-            return {"message": f"Successfully deleted data with ObjectId: {task_id}"}
+            return {"message": f"Successfully deleted task with ObjectId: {task_id}"}
         else:
-            return {"message": f"No data found with ObjectId: {task_id}"}
+            return {"message": f"No task found with ObjectId: {task_id}"}
     except Exception as e:
         return {"message": "Failed to delete task", "error": str(e)}
-
+    
 @router.put("/update_task/{task_id}/")
 async def update_task_api(user_name: str, task_id: str, task_data: TaskCreate, collection_name: str = None):
     # Validate user authentication
     if not validate_user(user_name):
         raise HTTPException(status_code=401, detail="Unauthorized")
-    
+
     if not collection_name:
         collection_name = get_collection_name()
-    
+
     try:
+        # Convert task_data to dictionary
+        task_data_dict = task_data.dict()
+
+        # Remove created_at field from task_data_dict to avoid updating it
+        task_data_dict.pop("created_at", None)
+
         # Call update_task function
-        updated_count = update_task(user_name, collection_name, task_id, task_data.task_text)
+        updated_count = update_task(user_name, collection_name, task_id, task_data_dict)
         if updated_count > 0:
             return {"message": f"Successfully updated task with ObjectId: {task_id}"}
         else:
@@ -308,9 +317,16 @@ def delete_task(username, collection_name, task_id):
     result = collection.delete_one({"_id": ObjectId(task_id)})
     return result.deleted_count
 
-def update_task(username, collection_name, task_id, updated_text):
+def update_task(username, collection_name, task_id, updated_task_data):
     collection = get_collection(username, collection_name)
-    result = collection.update_one({"_id": ObjectId(task_id)}, {"$set": {"task_text": updated_text}})
+
+    # Ensure the updated_task_data is formatted properly for update
+    updated_task_data = {key: value for key, value in updated_task_data.items() if value is not None}
+
+    # Set the updated_at field to the current datetime
+    updated_task_data["updated_at"] = datetime.now()
+
+    result = collection.update_one({"_id": ObjectId(task_id)}, {"$set": updated_task_data})
     return result.modified_count
 
 # Include the router in the main app
