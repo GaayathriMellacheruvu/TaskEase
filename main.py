@@ -12,17 +12,7 @@ import datefinder
 
 load_dotenv()
 
-# Connect to MongoDB
-client = MongoClient("mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/")
-db = client["API_KEY"]
-collection = db["openai_api_key"]
-
-# Fetch OpenAI API key from MongoDB
-api_key_document = collection.find_one({"name": "openai"})
-if api_key_document:
-    openai.api_key = api_key_document["key"]
-else:
-    raise Exception("OpenAI API key not found in the database")
+openai.api_key = "OPENAI_API_KEY"
 
 app = FastAPI()
 
