@@ -8,12 +8,21 @@ import openai
 from dotenv import load_dotenv
 import os
 import datefinder
+import torch
 
-# Load environment variables
 load_dotenv()
 
-# Set up OpenAI API
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Connect to MongoDB
+client = MongoClient("mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/")
+db = client["API_KEY"]
+collection = db["openai_api_key"]
+
+# Fetch OpenAI API key from MongoDB
+api_key_document = collection.find_one({"name": "openai"})
+if api_key_document:
+    openai.api_key = api_key_document["key"]
+else:
+    raise Exception("OpenAI API key not found in the database")
 
 app = FastAPI()
 
