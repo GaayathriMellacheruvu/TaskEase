@@ -8,7 +8,7 @@ import openai
 from dotenv import load_dotenv
 import os
 import datefinder
-import torch
+
 
 load_dotenv()
 
