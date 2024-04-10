@@ -1,427 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskEase</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <title>Chat Interface</title>
+    <!-- Include any CSS styles here -->
+    <style>
+        /* Add your CSS styles for the chat interface here */
+    </style>
 </head>
-
 <body>
-    <div id="menu">
-        <h2>MENU</h2>
-        <ul>
-            <li><a href="#" onclick="showLogin()">Login</a></li>
-            <li><a href="#" onclick="showRegister()">Register</a></li>
-            <li><a href="#" onclick="showManualText()">Manual Text</a></li>
-            <li><a href="#" onclick="showSpeechToText()">Speech to Text</a></li>
-            <li><a href="#" onclick="viewCollections()">View List</a></li>
-            <li><a href="#" onclick="showChat()">Chat</a></li>
-        </ul>
-    </div>
-
-    <div id="content">
-        <div id="container">
-            <h1>TASK EASE</h1>
-
-            <div id="collectionsSection" style="display: none;">
-                <h2>Collections</h2>
-                <div id="collections"></div>
-            </div>
-
-            <div id="loginForm" style="display: none;">
-                <h2>Login</h2>
-                <form id="loginForm">
-                    <label for="loginUsername">Username:</label>
-                    <input type="text" id="loginUsername" required>
-                    <button type="button" onclick="login()">Login</button>
-                    <div id="loginMessage"></div>
-                </form>
-            </div>
-
-            <div id="registerForm" style="display: none;">
-                <h2>Register</h2>
-                <form id="registerForm">
-                    <label for="registerUsername">Username:</label>
-                    <input type="text" id="registerUsername" required>
-                    <button type="button" onclick="register()">Register</button>
-                    <div id="registerMessage"></div>
-                </form>
-            </div>
-
-            <div id="taskManager" style="display: none;">
-                <!-- Task input sections -->
-                <div class="task-input" id="manualTextSection" style="display: none;">
-                    <!-- Manual Text input -->
-                    <label for="manualTask">Enter your task manually:</label>
-                    <input type="text" id="manualTask">
-                    <button type="button" onclick="saveManualTask()">Save Task</button>
-                    <div id="manualTextLoader" style="display: none;">Saving...</div>
-                </div>
-
-                <div class="task-input" id="speechToTextSection" style="display: none;">
-                    <!-- Speech to Text input -->
-                    <label>Enter your task using the microphone:</label>
-                    <button type="button" onclick="startRecording()">Start Recording 🎙</button>
-                    <button type="button" onclick="stopRecording()">Stop Recording 🛑</button>
-                    <div id="spokenTask"></div>
-                    <button type="button" onclick="saveSpokenTask()">Save Task</button>
-                    <div id="spokenTextLoader" style="display: none;">Saving...</div>
-                </div>
-
-                <div class="task-input" id="chatSection" style="display: none;">
-                    <!-- Chat input -->
-                    <label for="chatInput">Chat with the Task Manager Assistant:</label>
-                    <input type="text" id="chatInput">
-                    <button type="button" onclick="chatWithAssistant()">Send</button>
-                    <div id="chatOutput"></div>
-                    <div id="chatLoader" style="display: none;">Sending...</div>
-                </div>
-
-                <div id="tasksSection" style="display: none;">
-                    <h2>Tasks</h2>
-                    <div id="tasks"></div>
-                </div>    
-
-                <!-- Task saved message -->
-                <div id="taskSavedMessage" style="display: none;">
-                    <p>Task saved successfully!</p>
-                </div>
-            </div>
+    <div id="chat-container">
+        <div id="chat-messages"></div>
+        <div id="user-input">
+            <input type="text" id="message-input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
         </div>
     </div>
 
+    <!-- Include any JavaScript code here -->
     <script>
-        var username;
-        var recognition;
-        var spokenTaskDiv = document.getElementById('spokenTask');
+        // Function to send a message to OpenAI using the API key obtained from backend
+        function sendMessage() {
+            // Get the user input from the input field
+            const userInput = document.getElementById('message-input').value.trim();
 
-        function viewTasks(collectionName) {
-            hideAllSections();
-            fetchTasks(collectionName);
-        }
+            // Clear the input field
+            document.getElementById('message-input').value = '';
 
-        function fetchTasks(collectionName) {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}`, {
-                method: 'GET'
-            })
-                .then(response => response.json())
-                .then(data => {
-                    displayTasks(data.tasks);
-                })
-                .catch(error => console.error('Error fetching tasks:', error));
-        }
+            // Add the user message to the chat interface
+            appendMessage('You', userInput);
 
-        function displayTasks(tasks) {
-            const tasksDiv = document.getElementById('tasks');
-            tasksDiv.innerHTML = '';
+            // Simulate processing or loading indication
+            appendMessage('Chatbot', 'Processing...');
 
-            tasks.forEach(task => {
-                const taskItem = document.createElement('div');
-                taskItem.classList.add('task-item');
-                taskItem.innerHTML = `
-                    <p>${task.task_text}</p>
-                    <p><strong>Priority:</strong> ${task.priority}</p>
-                    <p><strong>Date:</strong> ${task.date}</p>
-                    <p><strong>Time:</strong> ${task.time}</p>
-                    <button onclick="deleteTask('${task.task_id}')">Delete</button>
-                    <button onclick="showUpdateTask('${task.task_id}', '${task.task_text}')">Update</button>
-                `;
-                tasksDiv.appendChild(taskItem);
-            });
+            // Make an asynchronous request to backend to retrieve the API key
+            fetch('/get_openai_api_key') // Adjust the endpoint based on your backend implementation
+            .then(response => response.json())
+            .then(data => {
+                const apiKey = data.OPENAI_API_KEY;
 
-            document.getElementById('tasksSection').style.display = 'block';
-        }
-
-        function showLogin() {
-            hideAllSections();
-            document.getElementById('loginForm').style.display = 'block';
-        }
-
-        function showRegister() {
-            hideAllSections();
-            document.getElementById('registerForm').style.display = 'block';
-        }
-
-        function login() {
-            var loginUsername = document.getElementById('loginUsername').value.trim();
-            if (loginUsername !== '') {
-                fetch(`https://task-ease-wv50.onrender.com/tasks/login/`, {
+                // Make an asynchronous request to OpenAI API using the obtained API key
+                fetch('https://api.openai.com/v1/completions', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}` // Use the obtained API key
                     },
                     body: JSON.stringify({
-                        username: loginUsername
+                        model: 'text-davinci-003',  // Adjust the model based on your preference
+                        prompt: userInput,
+                        max_tokens: 50  // Adjust the max tokens based on your preference
                     })
                 })
-                    .then(response => {
-                        if (response.ok) {
-                            username = loginUsername;
-                            document.getElementById('loginMessage').innerText = 'Login successful';
-                            document.getElementById('loginMessage').style.color = 'green';
-                            document.getElementById('loginForm').style.display = 'none';
-                            document.getElementById('taskManager').style.display = 'block';
-                            showManualText();
-                        } else if (response.status === 401) {
-                            document.getElementById('loginMessage').innerText = 'Login failed. Username does not exist.';
-                            document.getElementById('loginMessage').style.color = 'red';
-                        } else {
-                            document.getElementById('loginMessage').innerText = 'Login failed. Please try again.';
-                            document.getElementById('loginMessage').style.color = 'red';
-                        }
-                    })
-                    .catch(error => console.error('Error logging in:', error));
-            }
-        }
-
-        function register() {
-            var registerUsername = document.getElementById('registerUsername').value.trim();
-            if (registerUsername !== '') {
-                fetch(`https://task-ease-wv50.onrender.com/tasks/register/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: registerUsername
-                    })
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            username = registerUsername;
-                            document.getElementById('registerMessage').innerText = 'Registration successful';
-                            document.getElementById('registerMessage').style.color = 'green';
-                            document.getElementById('registerForm').style.display = 'none';
-                            document.getElementById('taskManager').style.display = 'block';
-                            showManualText();
-                        } else if (response.status === 400) {
-                            document.getElementById('registerMessage').innerText = 'Registration failed. Username already exists.';
-                            document.getElementById('registerMessage').style.color = 'red';
-                        } else {
-                            document.getElementById('registerMessage').innerText = 'Registration failed. Please try again.';
-                            document.getElementById('registerMessage').style.color = 'red';
-                        }
-                    })
-                    .catch(error => console.error('Error registering:', error));
-            }
-        }
-        function showManualText() {
-            hideAllSections();
-            document.getElementById('manualTextSection').style.display = 'block';
-        }
-
-        function showSpeechToText() {
-            hideAllSections();
-            document.getElementById('speechToTextSection').style.display = 'block';
-        }
-
-        function showChat() {
-            hideAllSections();
-            document.getElementById('chatSection').style.display = 'block';
-        }
-
-        function hideAllSections() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('manualTextSection').style.display = 'none';
-            document.getElementById('speechToTextSection').style.display = 'none';
-            document.getElementById('chatSection').style.display = 'none';
-        }
-
-        function addTask(taskText, loaderId) {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/add_task/?user_name=${username}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    task_text: taskText
-                })
-            })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Task added successfully:', data);
-                    clearTaskInputs();
-                    document.getElementById('taskSavedMessage').style.display = 'block';
-                    setTimeout(function () {
-                        document.getElementById('taskSavedMessage').style.display = 'none';
-                    }, 3000);
+                    // Add the response from OpenAI to the chat interface
+                    appendMessage('Chatbot', data.choices[0].text.trim());
                 })
-                .catch(error => console.error('Error adding task:', error))
-                .finally(() => {
-                    document.getElementById(loaderId).style.display = 'none';
+                .catch(error => {
+                    // Handle any errors that occur during the request
+                    console.error('Error sending message:', error);
+                    appendMessage('Chatbot', 'An error occurred while processing your request.');
                 });
-        }
-
-        function deleteTask(taskId) {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/delete_task/${taskId}/?user_name=${username}`, {
-                method: 'DELETE'
             })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Task deleted successfully');
-                    } else {
-                        console.error('Error deleting task:', response.statusText);
-                    }
-                })
-                .catch(error => console.error('Error deleting task:', error));
-        }
-
-        function showUpdateTask(taskId, taskText) {
-            const updatedTaskText = prompt('Update Task:', taskText);
-            if (updatedTaskText !== null) {
-                updateTask(taskId, updatedTaskText);
-            }
-        }
-
-        function updateTask(taskId, updatedTaskText) {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/update_task/${taskId}/?user_name=${username}`, {
-                method: 'PUT',
-                mode: 'cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    task_text: updatedTaskText
-                })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Task updated successfully');
-                    } else {
-                        console.error('Error updating task:', response.statusText);
-                    }
-                })
-                .catch(error => console.error('Error updating task:', error));
-        }
-
-        function clearTaskInputs() {
-            document.getElementById('manualTask').value = '';
-            spokenTaskDiv.innerText = '';
-        }
-
-        function saveManualTask() {
-            if (username) {
-                var manualTask = document.getElementById('manualTask').value.trim();
-                if (manualTask !== '') {
-                    document.getElementById('manualTextLoader').style.display = 'block';
-                    addTask(manualTask, 'manualTextLoader');
-                }
-            }
-        }
-
-        function startRecording() {
-            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-                recognition.continuous = true;
-                recognition.lang = 'en-US';
-                recognition.interimResults = true;
-
-                recognition.onresult = function (event) {
-                    var spokenTask = '';
-                    for (var i = event.resultIndex; i < event.results.length; i++) {
-                        if (event.results[i].isFinal) {
-                            spokenTask += event.results[i][0].transcript;
-                        }
-                    }
-                    spokenTaskDiv.innerText = spokenTask;
-                };
-
-                recognition.onerror = function (event) {
-                    console.error('Speech recognition error:', event.error);
-                };
-
-                recognition.onend = function () {
-                    console.log('Speech recognition ended');
-                };
-
-                recognition.start();
-            } else {
-                alert('Speech recognition is not supported in your browser. Please use a modern browser.');
-            }
-        }
-
-        function stopRecording() {
-            if (recognition) {
-                recognition.stop();
-            }
-        }
-
-        function saveSpokenTask() {
-            stopRecording();
-
-            var spokenTask = spokenTaskDiv.innerText.trim();
-            if (username && spokenTask !== '') {
-                document.getElementById('spokenTextLoader').style.display = 'block';
-                addTask(spokenTask, 'spokenTextLoader');
-            }
-        }
-
-        function chatWithAssistant() {
-            const chatInput = document.getElementById('chatInput').value.trim();
-            if (chatInput !== '') {
-                document.getElementById('chatLoader').style.display = 'block';
-
-                fetch(`https://task-ease-wv50.onrender.com/tasks/chat_with_gpt3_turbo/?username=${username}&collection_name=march`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({
-                        user_input: chatInput
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Response from server:', data);
-                        document.getElementById('chatOutput').innerText = data.message;
-                    })
-                    .catch(error => {
-                        console.error('Error chatting with assistant:', error);
-                    })
-                    .finally(() => {
-                        document.getElementById('chatLoader').style.display = 'none';
-                    });
-            }
-        }
-
-        function viewCollections() {
-            hideAllSections();
-            fetchCollections();
-        }
-
-        function fetchCollections() {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/list_collections/?username=${username}`, {
-                method: 'GET'
-            })
-                .then(response => response.json())
-                .then(data => {
-                    displayCollections(data.collections);
-                })
-                .catch(error => console.error('Error fetching collections:', error));
-        }
-
-        function displayCollections(collections) {
-            const collectionsDiv = document.getElementById('collections');
-            collectionsDiv.innerHTML = '';
-
-            collections.forEach(collection => {
-                const collectionItem = document.createElement('div');
-                collectionItem.classList.add('collection-item');
-                collectionItem.innerHTML = `
-                    <p>${collection.name}</p>
-                    <button onclick="viewTasks('${collection.name}')">View Tasks</button>
-                `;
-                collectionsDiv.appendChild(collectionItem);
+            .catch(error => {
+                // Handle any errors that occur when retrieving the API key from the backend
+                console.error('Error retrieving API key:', error);
+                appendMessage('Chatbot', 'An error occurred while processing your request.');
             });
-
-            document.getElementById('collectionsSection').style.display = 'block';
         }
 
+        // Function to append a message to the chat interface
+        function appendMessage(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatMessages.appendChild(messageElement);
+        }
     </script>
 </body>
-
 </html>
