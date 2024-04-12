@@ -7,8 +7,8 @@ import openai
 import datefinder
 from dateutil import parser
 
-# Set your OpenAI GPT-3 API key here
-openai.api_key = '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'
+# Set up OpenAI API
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Add custom styles
 st.markdown("""
