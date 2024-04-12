@@ -6,12 +6,12 @@ openai
 python-dotenv
 python-multipart
 pytz
-datefinder
 PyPDF2
 langchain
 tiktoken
-streamlit==1.14.0
-SpeechRecognition==3.8.1
-python-dateutil==2.8.2
 altair==4.1.0
-pyaudio
+datefinder==0.7.1
+python-dateutil==2.8.2
+pyaudio==0.2.11
+SpeechRecognition==3.8.1
+streamlit==1.1.0
