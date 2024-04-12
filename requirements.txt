@@ -14,3 +14,4 @@ streamlit==1.14.0
 SpeechRecognition==3.8.1
 python-dateutil==2.8.2
 altair==4.1.0
+pyaudio
