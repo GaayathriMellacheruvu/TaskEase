@@ -1,6 +1,6 @@
-fastapi==0.68.0
+fastapi==0.109.1
 uvicorn==0.14.0
-pymongo==3.12.0
+pymongo==4.6.3
 dnspython==2.1.0  # Required for MongoDB SRV URIs
 openai
 python-dotenv
@@ -13,5 +13,5 @@ altair==4.1.0
 datefinder==0.7.1
 python-dateutil==2.8.2
 SpeechRecognition==3.8.1
-streamlit==1.1.0
-protobuf==3.20.0
+streamlit==1.30.0
+protobuf==3.20.2
