@@ -1,4 +1,3 @@
-User
 import streamlit as st
 from pymongo import MongoClient
 from datetime import datetime
@@ -7,6 +6,7 @@ from bson import ObjectId
 import openai
 import datefinder
 from dateutil import parser
+import os
 
 # Set up OpenAI API
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -144,7 +144,7 @@ def chat_with_gpt3_turbo(prompt):
     )
     return response['choices'][0]['message']['content'].strip()
 
-def chat_with_user():
+def chat_with_user(user_name):
     st.subheader("Chat with the Task Manager Assistant")
     st.write("Use this chat window to interact with the assistant.")
 
@@ -164,8 +164,7 @@ def chat_with_user():
             st.success("Task saved successfully!")
 
 def main():
-    global user_name
-    user_name = get_user_info()
+    user_name = get_user_info()  # Assign the result of get_user_info() to user_name
 
     if user_name:
         recognizer = sr.Recognizer()
@@ -214,8 +213,7 @@ def main():
                         st.write(result_delete["message"])
 
         elif menu_choice == "Chat":
-            chat_with_user()
+            chat_with_user(user_name)  # Pass user_name to chat_with_user function
 
 if __name__ == "__main__":
     main()
-
