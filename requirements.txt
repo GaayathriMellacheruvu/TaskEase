@@ -3,5 +3,6 @@ openai
 pymongo
 SpeechRecognition
 datefinder
-dateutil
+python-dateutil
 bson
+python-dotenv
