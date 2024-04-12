@@ -8,3 +8,7 @@ python-multipart
 pytz
 datefinder
 streamlit
+streamlit
+python-dotenv
+PyPDF2
+langchain
