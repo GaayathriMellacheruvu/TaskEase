@@ -7,14 +7,9 @@ python-dotenv
 python-multipart
 pytz
 datefinder
-streamlit
-streamlit
-python-dotenv
 PyPDF2
 langchain
 tiktoken
 streamlit==1.14.0
-pymongo==4.0.1
 SpeechRecognition==3.8.1
-openai==0.10.2
 python-dateutil==2.8.2
