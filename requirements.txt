@@ -258,7 +258,6 @@ python-pptx==0.6.21
 pytz==2023.3
 pytz-deprecation-shim==0.1.0.post0
 pyviz-comms==2.3.2
-pywin32==306
 pywinpty==2.0.10
 PyYAML==6.0
 pyzmq==25.1.0
