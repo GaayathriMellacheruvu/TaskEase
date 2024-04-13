@@ -4,4 +4,4 @@ SpeechRecognition
 openai
 datefinder
 python-dateutil
-pyaudio
+pyaudio==0.2.11
