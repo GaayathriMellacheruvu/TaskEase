@@ -1,6 +1,6 @@
-streamlit==0.89.0
-pymongo==3.12.0
-SpeechRecognition==3.8.1
-openai==0.10.7
-datefinder==0.7.1
-python-dateutil==2.8.2
+streamlit
+pymongo
+SpeechRecognition
+openai
+datefinder
+python-dateutil
