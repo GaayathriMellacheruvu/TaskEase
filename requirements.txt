@@ -4,3 +4,4 @@ SpeechRecognition==3.8.1
 openai==0.10.5
 datefinder==0.7.1
 python-dateutil==2.8.2
+protobuf==3.19.4
