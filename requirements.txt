@@ -4,3 +4,4 @@ SpeechRecognition
 openai
 datefinder
 python-dateutil
+pyaudio
