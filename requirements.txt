@@ -13,3 +13,5 @@ spacy==3.6.1
 tensorflow==2.13.0
 torch==2.0.1
 transformers==4.34.0
+fastapi==0.68.0
+uvicorn==0.15.0
