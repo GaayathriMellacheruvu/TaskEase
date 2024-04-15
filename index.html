@@ -104,7 +104,7 @@
         }
 
         function fetchTasks(collectionName) {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}`, {
+            fetch(`https://taskease-m62t.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}`, {
                 method: 'GET'
             })
                 .then(response => response.json())
@@ -148,7 +148,7 @@
         function login() {
             var loginUsername = document.getElementById('loginUsername').value.trim();
             if (loginUsername !== '') {
-                fetch(`https://task-ease-wv50.onrender.com/tasks/login/`, {
+                fetch(`https://taskease-m62t.onrender.com/tasks/login/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -180,7 +180,7 @@
         function register() {
             var registerUsername = document.getElementById('registerUsername').value.trim();
             if (registerUsername !== '') {
-                fetch(`https://task-ease-wv50.onrender.com/tasks/register/`, {
+                fetch(`https://taskease-m62t.onrender.com/tasks/register/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -232,7 +232,7 @@
         }
 
         function addTask(taskText, loaderId) {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/add_task/?user_name=${username}`, {
+            fetch(`https://taskease-m62t.onrender.com/tasks/add_task/?user_name=${username}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -257,7 +257,7 @@
         }
 
         function deleteTask(taskId) {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/delete_task/${taskId}/?user_name=${username}`, {
+            fetch(`https://taskease-m62t.onrender.com/tasks/delete_task/${taskId}/?user_name=${username}`, {
                 method: 'DELETE'
             })
                 .then(response => {
@@ -278,7 +278,7 @@
         }
 
         function updateTask(taskId, updatedTaskText) {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/update_task/${taskId}/?user_name=${username}`, {
+            fetch(`https://taskease-m62t.onrender.com/tasks/update_task/${taskId}/?user_name=${username}`, {
                 method: 'PUT',
                 mode: 'cors',
                 headers: {
@@ -365,7 +365,7 @@
             if (chatInput !== '') {
                 document.getElementById('chatLoader').style.display = 'block';
 
-                fetch(`https://task-ease-wv50.onrender.com/tasks/chat_with_gpt3_turbo/?username=${username}&collection_name=march`, {
+                fetch(`https://taskease-m62t.onrender.com/tasks/chat_with_gpt3_turbo/?username=${username}&collection_name=march`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -394,7 +394,7 @@
         }
 
         function fetchCollections() {
-            fetch(`https://task-ease-wv50.onrender.com/tasks/list_collections/?username=${username}`, {
+            fetch(`https://taskease-m62t.onrender.com/tasks/list_collections/?username=${username}`, {
                 method: 'GET'
             })
                 .then(response => response.json())
