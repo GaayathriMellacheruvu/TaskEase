@@ -138,8 +138,7 @@
                         <p><strong>Date:</strong> ${task.date}</p>
                         <p><strong>Time:</strong> ${task.time}</p>
                         <button onclick="deleteTask('${task.task_id}')">Delete</button>
-                        <button onclick="showUpdateTask('${task.task_id}', '${task.task_text}')">Update</button>
-                    `;
+                                            `;
                 tasksDiv.appendChild(taskItem);
             });
     
@@ -355,68 +354,35 @@
                 .catch(error => console.error('Error deleting task:', error));
         }
     
-        function showUpdateTask(taskId, taskText) {
-            const updatedTaskText = prompt("Enter the updated task text:", taskText);
-            if (updatedTaskText !== null && updatedTaskText.trim() !== "") {
-                updateTask(taskId, updatedTaskText);
-            }
-        }
-    
-        async function updateTask(taskId, taskText) {
-            const priority = document.getElementById("priority").value;
-    
-            const url = `https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}`;
-            const payload = {
-                task_text: taskText,
-                priority: priority
-            };
-    
-            try {
-                const response = await fetch(url, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-    
-                if (!response.ok) {
-                    throw new Error('Failed to update task');
-                }
-    
-                const data = await response.json();
-                console.log(data);
-    
-                alert("Task updated successfully");
-            } catch (error) {
-                console.error('Error updating task:', error);
-                alert("Error updating task. Please try again later.");
-            }
-        }
+        // function showUpdateTask(taskId, taskText) {
+        //     const updatedTaskText = prompt("Enter the updated task text:", taskText);
+        //     if (updatedTaskText !== null && updatedTaskText.trim() !== "") {
+        //         updateTask(taskId, updatedTaskText);
+        //     }
+        // }
     
         function chatWithAssistant() {
             const chatInput = document.getElementById('chatInput').value.trim();
             if (chatInput !== '') {
                 document.getElementById('chatLoader').style.display = 'block';
     
-                fetch(`https://task-ease-537o.onrender.com/tasks/chat_with_gpt3_turbo/?username=${username}&collection_name=march`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: new URLSearchParams({
-                            user_input: chatInput
-                        })
+                // Construct the URL with query parameters
+                const url = `https://task-ease-537o.onrender.com/tasks/chat_with_chatbot?user_input=${encodeURIComponent(chatInput)}&username=${encodeURIComponent(username)}&collection_name=april`;
+    
+                // Make a POST request to the API to chat with the chatbot
+                fetch(url, {
+                        method: 'POST'
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Response from server:', data);
-                        document.getElementById('chatOutput').innerText = data.message;
+                        // Display the response from the server in the chat output area
+                        document.getElementById('chatOutput').innerText = data.response;
                     })
                     .catch(error => {
                         console.error('Error chatting with assistant:', error);
                     })
                     .finally(() => {
+                        // Hide the loading indicator after the request completes
                         document.getElementById('chatLoader').style.display = 'none';
                     });
             }
@@ -455,6 +421,6 @@
             document.getElementById('collectionsSection').style.display = 'block';
         }
     </script>
-    </body>
+</body>
 
 </html>
