@@ -110,32 +110,64 @@
                 <!-- Chat Section -->
                 <div class="task-input" id="chatSection" style="display: none;">
                     <!-- Chat input -->
-                    <label for="chatInput">Chat with the Task Manager Assistant:</label>
-                    <div class="form-group">
-                        <input type="text" id="chatInput" class="form-control">
-                    </div>
-                    <button type="button" class="primary-btn" onclick="chatWithAssistant()">Send</button>
+                    <label for="chatInput">Chat with the Task Manager:</label>
+                    <input type="text" id="chatInput" class="form-control" placeholder="Type your message here...">
+                    <button type="button" class="primary-btn" onclick="chatWithAssistant()">Send <i
+                            class="fas fa-paper-plane"></i></button>
                     <div id="chatOutput"></div>
-                    <div id="chatLoader" style="display: none;">Sending...</div>
+                    <div id="chatLoader" style="display: none;">Loading...</div>
+                                </div>
+
+                <!-- Update Task Form -->
+                <div id="updateTaskForm" class="task-input" style="display: none;">
+                    <h2>Update Task</h2>
+                    <form id="updateTaskForm">
+                        <div class="form-group">
+                            <label for="updateTaskId">Task ID:</label>
+                            <input type="text" id="updateTaskId" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateTaskText">Task Text:</label>
+                            <input type="text" id="updateTaskText" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updatePriority">Priority:</label>
+                            <select id="updatePriority" class="form-select">
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateTaskDate">Date:</label>
+                            <input type="date" id="updateTaskDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateTaskTime">Time:</label>
+                            <input type="time" id="updateTaskTime" class="form-control" required>
+                        </div>
+                        <button type="button" class="primary-btn" onclick="updateTask()">Update Task</button>
+                    </form>
                 </div>
 
 
-                <!-- Tasks Section -->
+                <!-- View Tasks Section -->
                 <div id="tasksSection" class="tasks-section" style="display: none;">
-                    <h2>Tasks</h2>
+                    <h2>Your Tasks</h2>
+                    <button onclick="backToViewList()">Back to View List</button>
                     <div id="tasks" class="tasks"></div>
-                </div>
-
-                <!-- Task Saved Message -->
-                <div id="taskSavedMessage" style="display: none;">
-                    <p>Task saved successfully!</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript and Font Awesome CDN -->
+    <!-- Notification Sound -->
+    <audio id="notificationSound" src="notification_sound.mp3"></audio>
+
+    <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <!-- JavaScript -->
     <script>
         var username;
 
@@ -168,6 +200,7 @@
                         <p><strong>Date:</strong> ${task.date}</p>
                         <p><strong>Time:</strong> ${task.time}</p>
                         <button onclick="deleteTask('${task.task_id}')">Delete</button>
+                        <button onclick="showUpdateForm('${task.task_id}', '${task.task_text}', '${task.priority}', '${task.date}', '${task.time}')">Update</button>
                     `;
                 tasksDiv.appendChild(taskItem);
             });
@@ -310,8 +343,7 @@
             }
         }
 
-        function addTask() {
-            const taskText = document.getElementById('taskText').value.trim();
+        function addTask(taskText, loaderId) {
             const priority = document.getElementById('priority').value;
             const taskTime = document.getElementById('taskTime').value.trim(); // Assuming you have an input field for task time
 
@@ -357,13 +389,15 @@
                 .then(data => {
                     console.log('Task added successfully:', data.message);
                     // Show a success message or perform any other actions
+                    document.getElementById(loaderId).style.display = 'none';
                     document.getElementById('taskSavedMessage').style.display = 'block';
                     // Optionally, refresh the task list
-                    fetchTasks();
+                    fetchTasks('april');
                 })
                 .catch(error => {
                     console.error('Error adding task:', error);
                     // Show an error message or perform error handling
+                    document.getElementById(loaderId).style.display = 'none';
                 });
         }
 
@@ -372,28 +406,18 @@
             document.getElementById('chatSection').style.display = 'block';
         }
 
+        function viewTasks(collectionName) {
+            hideAllSections();
+            fetchTasks(collectionName);
+        }
+
         function hideAllSections() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('manualTextSection').style.display = 'none';
             document.getElementById('chatSection').style.display = 'none';
             document.getElementById('speechToTextSection').style.display = 'none';
-        }
-
-        function deleteTask(taskId) {
-            fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}`, {
-                method: 'DELETE'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Task deleted successfully');
-                        // Optionally, refresh tasks after deletion
-                        fetchTasks();
-                    } else {
-                        console.error('Error deleting task:', response.statusText);
-                    }
-                })
-                .catch(error => console.error('Error deleting task:', error));
+            document.getElementById('collectionsSection').style.display = 'none'; // Hide collections section
         }
 
         function chatWithAssistant() {
@@ -478,6 +502,78 @@
                 });
             }
         }
+
+        function deleteTask(taskId) {
+            fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Task deleted successfully');
+                        // Optionally, refresh tasks after deletion
+                        fetchTasks('april');
+                    } else {
+                        console.error('Error deleting task:', response.statusText);
+                    }
+                })
+                .catch(error => console.error('Error deleting task:', error));
+        }
+
+        function backToViewList() {
+            document.getElementById('tasksSection').style.display = 'none';
+            document.getElementById('collectionsSection').style.display = 'block';
+        }
+
+        function showUpdateForm(taskId, taskText, priority, taskDate, taskTime) {
+    // Populate the update form fields with the task details
+    document.getElementById('updateTaskId').value = taskId;
+    document.getElementById('updateTaskText').value = taskText;
+    document.getElementById('updatePriority').value = priority;
+    document.getElementById('updateTaskDate').value = taskDate;
+    document.getElementById('updateTaskTime').value = taskTime;
+
+    // Show the update form
+    document.getElementById('updateTaskForm').style.display = 'block';
+}
+
+function updateTask() {
+    const taskId = document.getElementById('updateTaskId').value;
+    const taskText = document.getElementById('updateTaskText').value.trim();
+    const priority = document.getElementById('updatePriority').value;
+    const taskDate = document.getElementById('updateTaskDate').value;
+    const taskTime = document.getElementById('updateTaskTime').value;
+
+    // Prepare updated task data
+    const updatedTaskData = {
+        task_text: taskText,
+        priority: priority,
+        date: taskDate,
+        time: taskTime,
+        created_at: new Date().toISOString() // Include the updated created_at timestamp
+    };
+
+    // Make a PUT request to update the task
+    fetch(`https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}&collection_name=april`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedTaskData)
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Task updated successfully');
+            // Optionally, refresh tasks after updating
+            fetchTasks('april');
+            // Hide the update form
+            document.getElementById('updateTaskForm').style.display = 'none';
+        } else {
+            console.error('Error updating task:', response.statusText);
+        }
+    })
+    .catch(error => console.error('Error updating task:', error));
+}
+
     </script>
 </body>
 
