@@ -118,37 +118,38 @@
                     <div id="chatLoader" style="display: none;">Loading...</div>
                                 </div>
 
-                <!-- Update Task Form -->
-                <div id="updateTaskForm" class="task-input" style="display: none;">
-                    <h2>Update Task</h2>
-                    <form id="updateTaskForm">
-                        <div class="form-group">
-                            <label for="updateTaskId">Task ID:</label>
-                            <input type="text" id="updateTaskId" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="updateTaskText">Task Text:</label>
-                            <input type="text" id="updateTaskText" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="updatePriority">Priority:</label>
-                            <select id="updatePriority" class="form-select">
-                                <option value="Low">Low</option>
-                                <option value="Medium">Medium</option>
-                                <option value="High">High</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="updateTaskDate">Date:</label>
-                            <input type="date" id="updateTaskDate" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="updateTaskTime">Time:</label>
-                            <input type="time" id="updateTaskTime" class="form-control" required>
-                        </div>
-                        <button type="button" class="primary-btn" onclick="updateTask()">Update Task</button>
-                    </form>
-                </div>
+<!-- Update Task Form -->
+<div id="updateTaskForm" class="task-input" style="display: none;">
+    <h2>Update Task</h2>
+    <form id="updateTaskForm">
+        <!-- Disable the input field for task_id -->
+        <div class="form-group">
+            <label for="updateTaskId"></label>
+            <input type="text" id="updateTaskId" class="form-control" readonly disabled>
+        </div>
+        <div class="form-group">
+            <label for="updateTaskText">Task Text:</label>
+            <input type="text" id="updateTaskText" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="updatePriority">Priority:</label>
+            <select id="updatePriority" class="form-select">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="updateTaskDate">Date:</label>
+            <input type="date" id="updateTaskDate" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="updateTaskTime">Time:</label>
+            <input type="time" id="updateTaskTime" class="form-control" required>
+        </div>
+        <button type="button" class="primary-btn" onclick="updateTask()">Update Task</button>
+    </form>
+</div>
 
 
                 <!-- View Tasks Section -->
@@ -531,6 +532,8 @@
     document.getElementById('updatePriority').value = priority;
     document.getElementById('updateTaskDate').value = taskDate;
     document.getElementById('updateTaskTime').value = taskTime;
+
+    document.getElementById('updateTaskId').style.display = 'none';
 
     // Show the update form
     document.getElementById('updateTaskForm').style.display = 'block';
