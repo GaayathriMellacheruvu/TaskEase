@@ -344,42 +344,31 @@
             }
         }
 
-        function addTask(taskText, loaderId) {
+        function addTask() {
+            const taskText = document.getElementById('taskText').value.trim();
             const priority = document.getElementById('priority').value;
-            const taskTime = document.getElementById('taskTime').value.trim(); // Assuming you have an input field for task time
-
-            // Parse task time into a Date object
-            const taskDateTime = new Date(taskTime);
-
-            // Calculate time remaining until task time
-            const currentTime = new Date();
-            const timeUntilTask = taskDateTime - currentTime;
-
-            if (timeUntilTask > 0) {
-                // Schedule notification for task time
-                setTimeout(() => {
-                    // Display notification when task time arrives
-                    displayNotification(taskText);
-                }, timeUntilTask);
-            }
-
+    
+            // Get current date and time
+            const currentDate = new Date().toISOString().split('T')[0];
+            const currentTime = new Date().toTimeString().split(' ')[0];
+    
             // Prepare task data
             const taskData = {
                 task_text: taskText,
                 priority: priority,
-                date: taskDateTime.toDateString(),
-                time: taskDateTime.toTimeString().split(' ')[0],
+                date: currentDate,
+                time: currentTime,
                 created_at: new Date().toISOString()
             };
-
+    
             // Make a POST request to the API to add the task
             fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(taskData)
-            })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(taskData)
+                })
                 .then(response => {
                     if (response.ok) {
                         return response.json();
@@ -390,15 +379,13 @@
                 .then(data => {
                     console.log('Task added successfully:', data.message);
                     // Show a success message or perform any other actions
-                    document.getElementById(loaderId).style.display = 'none';
                     document.getElementById('taskSavedMessage').style.display = 'block';
                     // Optionally, refresh the task list
-                    fetchTasks('april');
+                    fetchTasks();
                 })
                 .catch(error => {
                     console.error('Error adding task:', error);
                     // Show an error message or perform error handling
-                    document.getElementById(loaderId).style.display = 'none';
                 });
         }
 
