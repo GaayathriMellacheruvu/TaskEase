@@ -10,95 +10,123 @@
 </head>
 
 <body>
-    <div id="menu">
-        <h2>MENU</h2>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">TaskEase</h1>
+            <p class="header-tagline">Simplify Your Tasks</p>
+        </div>
+    </header>
+
+    <!-- Side Menu -->
+    <div id="menu" class="menu">
         <ul>
-            <li><a href="#" onclick="showLogin()">Login</a></li>
-            <li><a href="#" onclick="showRegister()">Register</a></li>
-            <li><a href="#" onclick="showManualText()">Manual Text</a></li>
-            <li><a href="#" onclick="showSpeechToText()">Speech to Text</a></li>
-            <li><a href="#" onclick="viewCollections()">View List</a></li>
-            <li><a href="#" onclick="showChat()">Chat</a></li>
+            <li><a href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            <li><a href="#" onclick="showRegister()"><i class="fas fa-user-plus"></i> Register</a></li>
+            <li><a href="#" onclick="showManualText()"><i class="fas fa-pen"></i> Manual Text</a></li>
+            <li><a href="#" onclick="showSpeechToText()"><i class="fas fa-microphone-alt"></i> Speech to Text</a></li>
+            <li><a href="#" onclick="viewCollections()"><i class="fas fa-tasks"></i> View List</a></li>
+            <li><a href="#" onclick="showChat()"><i class="fas fa-comments"></i> Chat</a></li>
         </ul>
     </div>
 
-    <div id="content">
-        <div id="container">
-            <h1>TASK EASE</h1>
-
-            <div id="collectionsSection" style="display: none;">
+    <!-- Main Content -->
+    <div id="content" class="content">
+        <div id="container" class="container">
+            <div id="collectionsSection" class="collections-section" style="display: none;">
                 <h2>Collections</h2>
-                <div id="collections"></div>
+                <div id="collections" class="collections"></div>
             </div>
 
-            <div id="loginForm" style="display: none;">
+            <!-- Login Form -->
+            <div id="loginForm" class="task-input" style="display: none;">
                 <h2>Login</h2>
                 <form id="loginForm">
-                    <label for="loginUsername">Username:</label>
-                    <input type="text" id="loginUsername" required>
-                    <button type="button" onclick="login()">Login</button>
+                    <div class="form-group">
+                        <label for="loginUsername">Username:</label>
+                        <input type="text" id="loginUsername" class="form-control" required>
+                    </div>
+                    <button type="button" class="primary-btn" onclick="login()">Login</button>
                     <div id="loginMessage"></div>
                 </form>
             </div>
 
-            <div id="registerForm" style="display: none;">
+            <!-- Register Form -->
+            <div id="registerForm" class="task-input" style="display: none;">
                 <h2>Register</h2>
                 <form id="registerForm">
-                    <label for="registerUsername">Username:</label>
-                    <input type="text" id="registerUsername" required>
-                    <button type="button" onclick="register()">Register</button>
+                    <div class="form-group">
+                        <label for="registerUsername">Username:</label>
+                        <input type="text" id="registerUsername" class="form-control" required>
+                    </div>
+                    <button type="button" class="primary-btn" onclick="register()">Register</button>
                     <div id="registerMessage"></div>
                 </form>
             </div>
 
-            <div id="taskManager" style="display: none;">
-                <div id="manualTextSection" style="display: none;">
-                    <!-- Manual text input -->
+
+            <!-- Task Manager Section -->
+            <div id="taskManager" class="task-manager" style="display: none;">
+                <!-- Manual Text Input -->
+                <div id="manualTextSection" class="task-input" style="display: none;">
                     <h2>Add New Task</h2>
                     <form id="addTaskForm">
-                        <label for="taskText">Task Text:</label>
-                        <input type="text" id="taskText" required>
-                        <label for="priority">Priority:</label>
-                        <select id="priority">
-                            <option value="Low">Low</option>
-                            <option value="Medium">Medium</option>
-                            <option value="High">High</option>
-                        </select>
-                        <button type="button" onclick="addTask()">Add Task</button>
+                        <div class="form-group">
+                            <label for="taskText">Task Text:</label>
+                            <input type="text" id="taskText" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority:</label>
+                            <select id="priority" class="form-select">
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTime">Task Time:</label>
+                            <input type="datetime-local" id="taskTime" class="form-control" required>
+                        </div>
+                        <button type="button" class="primary-btn" onclick="addTask()">Add Task</button>
                         <div id="taskSavedMessage" style="display: none;">
                             <p>Task saved successfully!</p>
                         </div>
                     </form>
                 </div>
 
-                <div class="task-input" id="speechToTextSection" style="display: none;">
-                    <!-- Speech to Text input -->
+
+                <!-- Speech to Text Input -->
+                <div id="speechToTextSection" class="task-input" style="display: none;">
                     <label>Enter your task using the microphone:</label>
-                    <button type="button" onclick="startRecording()">Start Recording 🎙</button>
-                    <button type="button" onclick="stopRecording()">Stop Recording 🛑</button>
+                    <button type="button" class="primary-btn" onclick="startRecording()">Start Recording <i
+                            class="fas fa-microphone"></i></button>
+                    <button type="button" class="danger-btn" onclick="stopRecording()">Stop Recording <i
+                            class="fas fa-stop"></i></button>
                     <div id="spokenTask"></div>
-                    <button type="button" onclick="saveSpokenTask()">Save Task</button>
+                    <button type="button" class="success-btn" onclick="saveSpokenTask()">Save Task</button>
                     <div id="spokenTextLoader" style="display: none;">Saving...</div>
                 </div>
-                
 
-                
-
+                <!-- Chat Section -->
                 <div class="task-input" id="chatSection" style="display: none;">
                     <!-- Chat input -->
                     <label for="chatInput">Chat with the Task Manager Assistant:</label>
-                    <input type="text" id="chatInput">
-                    <button type="button" onclick="chatWithAssistant()">Send</button>
+                    <div class="form-group">
+                        <input type="text" id="chatInput" class="form-control">
+                    </div>
+                    <button type="button" class="primary-btn" onclick="chatWithAssistant()">Send</button>
                     <div id="chatOutput"></div>
                     <div id="chatLoader" style="display: none;">Sending...</div>
                 </div>
 
-                <div id="tasksSection" style="display: none;">
-                    <h2>Tasks</h2>
-                    <div id="tasks"></div>
-                </div>    
 
-                <!-- Task saved message -->
+                <!-- Tasks Section -->
+                <div id="tasksSection" class="tasks-section" style="display: none;">
+                    <h2>Tasks</h2>
+                    <div id="tasks" class="tasks"></div>
+                </div>
+
+                <!-- Task Saved Message -->
                 <div id="taskSavedMessage" style="display: none;">
                     <p>Task saved successfully!</p>
                 </div>
@@ -106,29 +134,31 @@
         </div>
     </div>
 
+    <!-- JavaScript and Font Awesome CDN -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
         var username;
-    
+
         function viewTasks(collectionName) {
             hideAllSections();
             fetchTasks(collectionName);
         }
-    
+
         function fetchTasks(collectionName) {
             fetch(https://task-ease-537o.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}, {
-                    method: 'GET'
-                })
+                method: 'GET'
+            })
                 .then(response => response.json())
                 .then(data => {
                     displayTasks(data.tasks);
                 })
                 .catch(error => console.error('Error fetching tasks:', error));
         }
-    
+
         function displayTasks(tasks) {
             const tasksDiv = document.getElementById('tasks');
             tasksDiv.innerHTML = '';
-    
+
             tasks.forEach(task => {
                 const taskItem = document.createElement('div');
                 taskItem.classList.add('task-item');
@@ -138,35 +168,35 @@
                         <p><strong>Date:</strong> ${task.date}</p>
                         <p><strong>Time:</strong> ${task.time}</p>
                         <button onclick="deleteTask('${task.task_id}')">Delete</button>
-                                            `;
+                    `;
                 tasksDiv.appendChild(taskItem);
             });
-    
+
             document.getElementById('tasksSection').style.display = 'block';
         }
-    
+
         function showLogin() {
             hideAllSections();
             document.getElementById('loginForm').style.display = 'block';
         }
-    
+
         function showRegister() {
             hideAllSections();
             document.getElementById('registerForm').style.display = 'block';
         }
-    
+
         function login() {
             var loginUsername = document.getElementById('loginUsername').value.trim();
             if (loginUsername !== '') {
                 fetch(https://task-ease-537o.onrender.com/tasks/login/, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            username: loginUsername
-                        })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: loginUsername
                     })
+                })
                     .then(response => {
                         if (response.ok) {
                             username = loginUsername;
@@ -186,19 +216,19 @@
                     .catch(error => console.error('Error logging in:', error));
             }
         }
-    
+
         function register() {
             var registerUsername = document.getElementById('registerUsername').value.trim();
             if (registerUsername !== '') {
                 fetch(https://task-ease-537o.onrender.com/tasks/register/, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            username: registerUsername
-                        })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: registerUsername
                     })
+                })
                     .then(response => {
                         if (response.ok) {
                             username = registerUsername;
@@ -218,20 +248,20 @@
                     .catch(error => console.error('Error registering:', error));
             }
         }
-    
+
         function showManualText() {
             hideAllSections();
             document.getElementById('manualTextSection').style.display = 'block';
         }
-    
+
         var recognition;
         var spokenTaskDiv = document.getElementById('spokenTask');
-    
+
         function showSpeechToText() {
             hideAllSections();
             document.getElementById('speechToTextSection').style.display = 'block';
         }
-    
+
         function startRecording() {
             // Check if browser supports speech recognition
             if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
@@ -239,8 +269,8 @@
                 recognition.continuous = true;
                 recognition.lang = 'en-US';
                 recognition.interimResults = true;
-    
-                recognition.onresult = function(event) {
+
+                recognition.onresult = function (event) {
                     var spokenTask = '';
                     for (var i = event.resultIndex; i < event.results.length; i++) {
                         if (event.results[i].isFinal) {
@@ -249,62 +279,74 @@
                     }
                     spokenTaskDiv.innerText = spokenTask;
                 };
-    
-                recognition.onerror = function(event) {
+
+                recognition.onerror = function (event) {
                     console.error('Speech recognition error:', event.error);
                 };
-    
-                recognition.onend = function() {
+
+                recognition.onend = function () {
                     console.log('Speech recognition ended');
                 };
-    
+
                 recognition.start();
             } else {
                 alert('Speech recognition is not supported in your browser. Please use a modern browser.');
             }
         }
-    
+
         function stopRecording() {
             if (recognition) {
                 recognition.stop();
             }
         }
-    
+
         function saveSpokenTask() {
             stopRecording();
-    
+
             var spokenTask = spokenTaskDiv.innerText.trim();
             if (username && spokenTask !== '') {
                 document.getElementById('spokenTextLoader').style.display = 'block';
                 addTask(spokenTask, 'spokenTextLoader');
             }
         }
-    
+
         function addTask() {
             const taskText = document.getElementById('taskText').value.trim();
             const priority = document.getElementById('priority').value;
-    
-            // Get current date and time
-            const currentDate = new Date().toISOString().split('T')[0];
-            const currentTime = new Date().toTimeString().split(' ')[0];
-    
+            const taskTime = document.getElementById('taskTime').value.trim(); // Assuming you have an input field for task time
+
+            // Parse task time into a Date object
+            const taskDateTime = new Date(taskTime);
+
+            // Calculate time remaining until task time
+            const currentTime = new Date();
+            const timeUntilTask = taskDateTime - currentTime;
+
+            if (timeUntilTask > 0) {
+                // Schedule notification for task time
+                setTimeout(() => {
+                    // Display notification when task time arrives
+                    displayNotification(taskText);
+                }, timeUntilTask);
+            }
+
             // Prepare task data
             const taskData = {
                 task_text: taskText,
                 priority: priority,
-                date: currentDate,
-                time: currentTime,
+                date: taskDateTime.toDateString(),
+                time: taskDateTime.toTimeString().split(' ')[0],
                 created_at: new Date().toISOString()
             };
-    
+
             // Make a POST request to the API to add the task
             fetch(https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(taskData)
-                })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(taskData)
+            })
                 .then(response => {
                     if (response.ok) {
                         return response.json();
@@ -324,12 +366,12 @@
                     // Show an error message or perform error handling
                 });
         }
-    
+
         function showChat() {
             hideAllSections();
             document.getElementById('chatSection').style.display = 'block';
         }
-    
+
         function hideAllSections() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'none';
@@ -337,11 +379,11 @@
             document.getElementById('chatSection').style.display = 'none';
             document.getElementById('speechToTextSection').style.display = 'none';
         }
-    
+
         function deleteTask(taskId) {
             fetch(https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}, {
-                    method: 'DELETE'
-                })
+                method: 'DELETE'
+            })
                 .then(response => {
                     if (response.ok) {
                         console.log('Task deleted successfully');
@@ -353,26 +395,19 @@
                 })
                 .catch(error => console.error('Error deleting task:', error));
         }
-    
-        // function showUpdateTask(taskId, taskText) {
-        //     const updatedTaskText = prompt("Enter the updated task text:", taskText);
-        //     if (updatedTaskText !== null && updatedTaskText.trim() !== "") {
-        //         updateTask(taskId, updatedTaskText);
-        //     }
-        // }
-    
+
         function chatWithAssistant() {
             const chatInput = document.getElementById('chatInput').value.trim();
             if (chatInput !== '') {
                 document.getElementById('chatLoader').style.display = 'block';
-    
+
                 // Construct the URL with query parameters
                 const url = https://task-ease-537o.onrender.com/tasks/chat_with_chatbot?user_input=${encodeURIComponent(chatInput)}&username=${encodeURIComponent(username)}&collection_name=april;
-    
+
                 // Make a POST request to the API to chat with the chatbot
                 fetch(url, {
-                        method: 'POST'
-                    })
+                    method: 'POST'
+                })
                     .then(response => response.json())
                     .then(data => {
                         // Display the response from the server in the chat output area
@@ -387,38 +422,61 @@
                     });
             }
         }
-    
+
         function viewCollections() {
             hideAllSections();
             fetchCollections();
         }
-    
+
         function fetchCollections() {
             fetch(https://task-ease-537o.onrender.com/tasks/collections/${username}, {
-                    method: 'GET'
-                })
+                method: 'GET'
+            })
                 .then(response => response.json())
                 .then(data => {
                     displayCollections(data.collections);
                 })
                 .catch(error => console.error('Error fetching collections:', error));
         }
-    
+
         function displayCollections(collections) {
             const collectionsDiv = document.getElementById('collections');
             collectionsDiv.innerHTML = '';
-    
+
             collections.forEach(collection => {
                 const collectionItem = document.createElement('div');
                 collectionItem.classList.add('collection-item');
                 collectionItem.innerHTML = `
                         <p>${collection}</p>
-                        <button onclick="viewTasks('${collection}')">View Tasks</button>
+                        <button type="button" class="primary-btn" onclick="viewTasks('${collection}')">View Tasks</button>                        
                     `;
                 collectionsDiv.appendChild(collectionItem);
             });
-    
+
             document.getElementById('collectionsSection').style.display = 'block';
+        }
+
+        function displayNotification(taskText) {
+            // Play notification sound
+            var notificationSound = document.getElementById('notificationSound');
+            notificationSound.play();
+
+            // Display notification
+            if (Notification.permission === 'granted') {
+                new Notification('Task Reminder', {
+                    body: taskText,
+                    icon: 'notification_icon.png' // Path to your notification icon
+                });
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification('Task Reminder', {
+                            body: taskText,
+                            icon: 'notification_icon.png' // Path to your notification icon
+                        });
+                    }
+                });
+            }
         }
     </script>
 </body>
