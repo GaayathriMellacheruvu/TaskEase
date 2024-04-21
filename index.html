@@ -34,6 +34,7 @@
             <li><a href="#" onclick="showSpeechToText()"><i class="fas fa-microphone-alt"></i> Speech to Text</a></li>
             <li><a href="#" onclick="viewCollections()"><i class="fas fa-tasks"></i> View List</a></li>
             <li><a href="#" onclick="showChat()"><i class="fas fa-comments"></i> Chat</a></li>
+            <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </div>
 
@@ -112,7 +113,7 @@
                             class="fas fa-stop"></i></button>
                     <div id="spokenTask"></div>
                     <button type="button" class="secondary-btn" onclick="saveSpokenTask()">Save Task</button>
-                    <div id="spokenTextLoader" style="display: none;">Saving...</div>
+                    <div id="spokenTextLoader" style="display: none;" class="loading">Saving..</div>
                 </div>
 
                 <!-- Chat Section -->
@@ -124,7 +125,8 @@
                     <button type="button" class="primary-btn" onclick="chatWithAssistant()">Send <i
                             class="fas fa-paper-plane"></i></button>
                     <div id="chatOutput"></div>
-                    <div id="chatLoader" style="display: none;">Loading...</div>
+                    <div id="chatLoader" style="display: none;" class="loading"></div>
+
                 </div>
 
                 <!-- Update Task Form -->
@@ -275,6 +277,17 @@
                     .catch(error => console.error('Error logging in:', error));
             }
         }
+
+        function logout() {
+            // Clear user session or perform logout actions
+            username = null; // Clear the username
+            hideAllSections(); // Hide all sections after logout
+            showLogin(); // Show the login form again
+            // Reload the page
+            window.location.reload();
+        }
+
+
 
         function showCollectionsForCurrentMonth() {
             // Get current month and year
@@ -471,7 +484,11 @@
                     .then(response => response.json())
                     .then(data => {
                         // Display the response from the server in the chat output area
-                        document.getElementById('chatOutput').innerText = data.response;
+                        // Inside the function where you display the response from the chatbot
+                        document.getElementById('chatOutput').innerHTML = `<div class="chatbot-response">${data.response}</div>`;
+
+                        // Clear the input field
+                        document.getElementById('chatInput').value = '';
                     })
                     .catch(error => {
                         console.error('Error chatting with assistant:', error);
@@ -482,6 +499,7 @@
                     });
             }
         }
+
 
         function viewCollections() {
             hideAllSections();
