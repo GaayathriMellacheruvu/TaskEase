@@ -242,7 +242,8 @@
                             document.getElementById('loginMessage').style.color = 'green';
                             document.getElementById('loginForm').style.display = 'none';
                             document.getElementById('taskManager').style.display = 'block';
-                            showManualText();
+                            // Show collections for the current month
+                            showCollectionsForCurrentMonth();
                         } else if (response.status === 401) {
                             document.getElementById('loginMessage').innerText = 'Login failed. Username does not exist.';
                             document.getElementById('loginMessage').style.color = 'red';
@@ -254,6 +255,17 @@
                     .catch(error => console.error('Error logging in:', error));
             }
         }
+
+        function showCollectionsForCurrentMonth() {
+            // Get current month and year
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1; // January is 0, so add 1
+            const currentYear = currentDate.getFullYear();
+
+            // Fetch collections for the current month
+            fetchCollections(`${currentYear}-${currentMonth}`);
+        }
+
 
         function register() {
             var registerUsername = document.getElementById('registerUsername').value.trim();
