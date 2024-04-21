@@ -48,6 +48,7 @@
                     </div>
                     <button type="button" class="primary-btn" onclick="login()">Login</button>
                     <div id="loginMessage"></div>
+                    <p>Don't have an account? <a href="#" onclick="showRegister()">Register here</a>.</p>
                 </form>
             </div>
 
@@ -64,35 +65,35 @@
                 </form>
             </div>
 
-<!-- Task Manager Section -->
-<div id="taskManager" class="task-manager" style="display: none;">
-<!-- Manual Text Input -->
-<div id="manualTextSection" class="task-input" style="display: none;">
-    <h2>Add New Task</h2>
-    <form id="addTaskForm">
-        <div class="form-group">
-            <label for="taskText">Task Text:</label>
-            <input type="text" id="taskText" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="priority">Priority:</label>
-            <select id="priority" class="form-select">
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="taskDateTime">Task Date and Time:</label>
-            <input type="datetime-local" id="taskDateTime" class="form-control" required>
-        </div>
-        <button type="button" class="primary-btn" onclick="addTask()">Add Task</button>
-        <div id="taskSavedMessage" style="display: none;">
-            <p>Task saved successfully!</p>
-        </div>
-        <div id="output"></div>
-    </form>
-</div>
+            <!-- Task Manager Section -->
+            <div id="taskManager" class="task-manager" style="display: none;">
+                <!-- Manual Text Input -->
+                <div id="manualTextSection" class="task-input" style="display: none;">
+                    <h2>Add New Task</h2>
+                    <form id="addTaskForm">
+                        <div class="form-group">
+                            <label for="taskText">Task Text:</label>
+                            <input type="text" id="taskText" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority:</label>
+                            <select id="priority" class="form-select">
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDateTime">Task Date and Time:</label>
+                            <input type="datetime-local" id="taskDateTime" class="form-control" required>
+                        </div>
+                        <button type="button" class="primary-btn" onclick="addTask()">Add Task</button>
+                        <div id="taskSavedMessage" style="display: none;">
+                            <p>Task saved successfully!</p>
+                        </div>
+                        <div id="output"></div>
+                    </form>
+                </div>
 
                 <!-- Speech to Text Input -->
                 <div id="speechToTextSection" class="task-input" style="display: none;">
@@ -115,40 +116,40 @@
                             class="fas fa-paper-plane"></i></button>
                     <div id="chatOutput"></div>
                     <div id="chatLoader" style="display: none;">Loading...</div>
-                                </div>
+                </div>
 
-<!-- Update Task Form -->
-<div id="updateTaskForm" class="task-input" style="display: none;">
-    <h2>Update Task</h2>
-    <form id="updateTaskForm">
-        <!-- Disable the input field for task_id -->
-        <div class="form-group">
-            <label for="updateTaskId"></label>
-            <input type="text" id="updateTaskId" class="form-control" readonly disabled>
-        </div>
-        <div class="form-group">
-            <label for="updateTaskText">Task Text:</label>
-            <input type="text" id="updateTaskText" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="updatePriority">Priority:</label>
-            <select id="updatePriority" class="form-select">
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="updateTaskDate">Date:</label>
-            <input type="date" id="updateTaskDate" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="updateTaskTime">Time:</label>
-            <input type="time" id="updateTaskTime" class="form-control" required>
-        </div>
-        <button type="button" class="primary-btn" onclick="updateTask()">Update Task</button>
-    </form>
-</div>
+                <!-- Update Task Form -->
+                <div id="updateTaskForm" class="task-input" style="display: none;">
+                    <h2>Update Task</h2>
+                    <form id="updateTaskForm">
+                        <!-- Disable the input field for task_id -->
+                        <div class="form-group">
+                            <label for="updateTaskId"></label>
+                            <input type="text" id="updateTaskId" class="form-control" readonly disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateTaskText">Task Text:</label>
+                            <input type="text" id="updateTaskText" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updatePriority">Priority:</label>
+                            <select id="updatePriority" class="form-select">
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateTaskDate">Date:</label>
+                            <input type="date" id="updateTaskDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateTaskTime">Time:</label>
+                            <input type="time" id="updateTaskTime" class="form-control" required>
+                        </div>
+                        <button type="button" class="primary-btn" onclick="updateTask()">Update Task</button>
+                    </form>
+                </div>
 
 
                 <!-- View Tasks Section -->
@@ -207,6 +208,10 @@
 
             document.getElementById('tasksSection').style.display = 'block';
         }
+
+        window.onload = function () {
+            showLogin();
+        };
 
         function showLogin() {
             hideAllSections();
@@ -344,61 +349,61 @@
         }
 
         function addTask() {
-    const taskText = document.getElementById('taskText').value.trim();
-    const priority = document.getElementById('priority').value;
-    const taskDateTime = document.getElementById('taskDateTime').value;
+            const taskText = document.getElementById('taskText').value.trim();
+            const priority = document.getElementById('priority').value;
+            const taskDateTime = document.getElementById('taskDateTime').value;
 
-    // Check if the task text and datetime are provided
-    if (taskText === '' || taskDateTime === '') {
-        // Display an error message or handle the case where inputs are missing
-        document.getElementById('output').innerText = 'Task already exists with the given date and time';
-        return;
-    }
+            // Check if the task text and datetime are provided
+            if (taskText === '' || taskDateTime === '') {
+                // Display an error message or handle the case where inputs are missing
+                document.getElementById('output').innerText = 'Task already exists with the given date and time';
+                return;
+            }
 
-    // Prepare task data
-    const taskData = {
-        task_text: taskText,
-        priority: priority,
-        created_at: new Date(taskDateTime).toISOString()
-    };
+            // Prepare task data
+            const taskData = {
+                task_text: taskText,
+                priority: priority,
+                created_at: new Date(taskDateTime).toISOString()
+            };
 
-    // Make a POST request to the API to add the task
-    fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(taskData)
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else if (response.status === 400) {
-                return response.json().then(data => {
-                    // Display the error message on the screen
-                    document.getElementById('taskSavedMessage').style.display = 'none';
-                    document.getElementById('addError').innerText = data.detail;
-                    document.getElementById('addError').style.color = 'red';
+            // Make a POST request to the API to add the task
+            fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(taskData)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else if (response.status === 400) {
+                        return response.json().then(data => {
+                            // Display the error message on the screen
+                            document.getElementById('taskSavedMessage').style.display = 'none';
+                            document.getElementById('addError').innerText = data.detail;
+                            document.getElementById('addError').style.color = 'red';
+                        });
+                    } else {
+                        throw new Error('Failed to add task');
+                    }
+                })
+                .then(data => {
+                    if (data) {
+                        console.log('Task added successfully:', data.message);
+                        // Show a success message or perform any other actions
+                        document.getElementById('addError').innerText = '';
+                        document.getElementById('taskSavedMessage').style.display = 'block';
+                        // Optionally, refresh the task list
+                        fetchTasks('april');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding task:', error);
+                    // Show an error message or perform error handling
                 });
-            } else {
-                throw new Error('Failed to add task');
-            }
-        })
-        .then(data => {
-            if (data) {
-                console.log('Task added successfully:', data.message);
-                // Show a success message or perform any other actions
-                document.getElementById('addError').innerText = '';
-                document.getElementById('taskSavedMessage').style.display = 'block';
-                // Optionally, refresh the task list
-                fetchTasks('april');
-            }
-        })
-        .catch(error => {
-            console.error('Error adding task:', error);
-            // Show an error message or perform error handling
-        });
-}
+        }
 
         function showChat() {
             hideAllSections();
@@ -524,56 +529,56 @@
         }
 
         function showUpdateForm(taskId, taskText, priority, taskDate, taskTime) {
-    // Populate the update form fields with the task details
-    document.getElementById('updateTaskId').value = taskId;
-    document.getElementById('updateTaskText').value = taskText;
-    document.getElementById('updatePriority').value = priority;
-    document.getElementById('updateTaskDate').value = taskDate;
-    document.getElementById('updateTaskTime').value = taskTime;
+            // Populate the update form fields with the task details
+            document.getElementById('updateTaskId').value = taskId;
+            document.getElementById('updateTaskText').value = taskText;
+            document.getElementById('updatePriority').value = priority;
+            document.getElementById('updateTaskDate').value = taskDate;
+            document.getElementById('updateTaskTime').value = taskTime;
 
-    document.getElementById('updateTaskId').style.display = 'none';
+            document.getElementById('updateTaskId').style.display = 'none';
 
-    // Show the update form
-    document.getElementById('updateTaskForm').style.display = 'block';
-}
-
-function updateTask() {
-    const taskId = document.getElementById('updateTaskId').value;
-    const taskText = document.getElementById('updateTaskText').value.trim();
-    const priority = document.getElementById('updatePriority').value;
-    const taskDate = document.getElementById('updateTaskDate').value;
-    const taskTime = document.getElementById('updateTaskTime').value;
-
-    // Prepare updated task data
-    const updatedTaskData = {
-        task_text: taskText,
-        priority: priority,
-        date: taskDate,
-        time: taskTime,
-        created_at: new Date().toISOString() // Include the updated created_at timestamp
-    };
-
-    // Make a PUT request to update the task
-    fetch(`https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}&collection_name=april`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedTaskData)
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log('Task updated successfully');
-            // Optionally, refresh tasks after updating
-            fetchTasks('april');
-            // Hide the update form
-            document.getElementById('updateTaskForm').style.display = 'none';
-        } else {
-            console.error('Error updating task:', response.statusText);
+            // Show the update form
+            document.getElementById('updateTaskForm').style.display = 'block';
         }
-    })
-    .catch(error => console.error('Error updating task:', error));
-}
+
+        function updateTask() {
+            const taskId = document.getElementById('updateTaskId').value;
+            const taskText = document.getElementById('updateTaskText').value.trim();
+            const priority = document.getElementById('updatePriority').value;
+            const taskDate = document.getElementById('updateTaskDate').value;
+            const taskTime = document.getElementById('updateTaskTime').value;
+
+            // Prepare updated task data
+            const updatedTaskData = {
+                task_text: taskText,
+                priority: priority,
+                date: taskDate,
+                time: taskTime,
+                created_at: new Date().toISOString() // Include the updated created_at timestamp
+            };
+
+            // Make a PUT request to update the task
+            fetch(`https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}&collection_name=april`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedTaskData)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Task updated successfully');
+                        // Optionally, refresh tasks after updating
+                        fetchTasks('april');
+                        // Hide the update form
+                        document.getElementById('updateTaskForm').style.display = 'none';
+                    } else {
+                        console.error('Error updating task:', response.statusText);
+                    }
+                })
+                .catch(error => console.error('Error updating task:', error));
+        }
 
     </script>
 </body>
