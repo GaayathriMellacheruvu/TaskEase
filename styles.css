@@ -27,13 +27,22 @@ body {
 
 /* Side Menu Styles */
 .menu {
-    background-color: #2c3e50;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(to bottom, #405b70, #293f50);
     position: fixed;
     top: 0;
-    left: 0;
-    bottom: 0;
-    width: 250px;
+    left: -250px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     overflow-y: auto;
+    padding-top: 20px;
+    color: #fff;
+}
+
+.menu-opened {
+    left: 0;
 }
 
 .menu ul {
@@ -43,13 +52,13 @@ body {
 }
 
 .menu li {
-    padding: 15px 20px;
+    padding: 10px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
 }
 
-.menu li:last-child {
-    border-bottom: none;
+.menu li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .menu a {
@@ -63,15 +72,43 @@ body {
     margin-right: 10px;
 }
 
-.menu a:hover {
-    background-color: #34495e;
-}
-
-/* Main Content Styles */
 .content {
     margin-left: 250px;
     padding: 20px;
 }
+
+.toggle-menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 0; /* Make edges rectangular */
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+    background-color: transparent; /* Remove background color */
+}
+
+
+.toggle-menu-btn i {
+    font-size: 20px;
+    display: block;
+    width: 30px;
+    height: 3px;
+    background-color: #fff;
+    margin-bottom: 5px;
+    border-radius: 3px;
+}
+
+/* Main Content Styles */
+.content {
+    margin: 0 auto; /* Center content horizontally */
+    padding: 20px;
+}
+
 
 .container {
     background-color: #ecf0f1;
@@ -249,3 +286,5 @@ button {
 .primary-btn:hover {
     background-color: #2980b9;
 }
+
+
