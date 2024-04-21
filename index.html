@@ -34,7 +34,7 @@
     <div id="content" class="content">
         <div id="container" class="container">
             <div id="collectionsSection" class="collections-section" style="display: none;">
-                <h2>Collections</h2>
+                <h5><b>COLLECTIONS</b></h5>
                 <div id="collections" class="collections"></div>
             </div>
 
@@ -43,11 +43,12 @@
                 <h2>Login</h2>
                 <form id="loginForm">
                     <div class="form-group">
-                        <label for="loginUsername">Username:</label>
-                        <input type="text" id="loginUsername" class="form-control" required>
+                        
+                        <input type="text" id="loginUsername" class="form-control" placeholder="Username" required>
                     </div>
                     <button type="button" class="primary-btn" onclick="login()">Login</button>
                     <div id="loginMessage"></div>
+                    <br>
                     <p>Don't have an account? <a href="#" onclick="showRegister()">Register here</a>.</p>
                 </form>
             </div>
@@ -57,10 +58,10 @@
                 <h2>Register</h2>
                 <form id="registerForm">
                     <div class="form-group">
-                        <label for="registerUsername">Username:</label>
-                        <input type="text" id="registerUsername" class="form-control" required>
+                        
+                        <input type="text" id="registerUsername" class="form-control" placeholder="Username" required>
                     </div>
-                    <button type="button" class="primary-btn" onclick="register()">Register</button>
+                    <button type="button" class="secondary-btn" onclick="register()">Register</button>
                     <div id="registerMessage"></div>
                 </form>
             </div>
@@ -69,7 +70,7 @@
             <div id="taskManager" class="task-manager" style="display: none;">
                 <!-- Manual Text Input -->
                 <div id="manualTextSection" class="task-input" style="display: none;">
-                    <h2>Add New Task</h2>
+                    <h4><b>Add New Task</b></h4>
                     <form id="addTaskForm">
                         <div class="form-group">
                             <label for="taskText">Task Text:</label>
@@ -97,21 +98,22 @@
 
                 <!-- Speech to Text Input -->
                 <div id="speechToTextSection" class="task-input" style="display: none;">
-                    <label>Enter your task using the microphone:</label>
+                    <label><b>Enter your task using the microphone:</b></label>
                     <button type="button" class="primary-btn" onclick="startRecording()">Start Recording <i
                             class="fas fa-microphone"></i></button>
                     <button type="button" class="danger-btn" onclick="stopRecording()">Stop Recording <i
                             class="fas fa-stop"></i></button>
                     <div id="spokenTask"></div>
-                    <button type="button" class="success-btn" onclick="saveSpokenTask()">Save Task</button>
+                    <button type="button" class="secondary-btn" onclick="saveSpokenTask()">Save Task</button>
                     <div id="spokenTextLoader" style="display: none;">Saving...</div>
                 </div>
 
                 <!-- Chat Section -->
                 <div class="task-input" id="chatSection" style="display: none;">
                     <!-- Chat input -->
-                    <label for="chatInput">Chat with the Task Manager:</label>
+                    <label for="chatInput"><b>Chat with the Task Manager:</b></label>
                     <input type="text" id="chatInput" class="form-control" placeholder="Type your message here...">
+                    <br>
                     <button type="button" class="primary-btn" onclick="chatWithAssistant()">Send <i
                             class="fas fa-paper-plane"></i></button>
                     <div id="chatOutput"></div>
