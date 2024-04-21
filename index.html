@@ -64,36 +64,35 @@
                 </form>
             </div>
 
-
-            <!-- Task Manager Section -->
-            <div id="taskManager" class="task-manager" style="display: none;">
-                <!-- Manual Text Input -->
-                <div id="manualTextSection" class="task-input" style="display: none;">
-                    <h2>Add New Task</h2>
-                    <form id="addTaskForm">
-                        <div class="form-group">
-                            <label for="taskText">Task Text:</label>
-                            <input type="text" id="taskText" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="priority">Priority:</label>
-                            <select id="priority" class="form-select">
-                                <option value="Low">Low</option>
-                                <option value="Medium">Medium</option>
-                                <option value="High">High</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskTime">Task Time:</label>
-                            <input type="datetime-local" id="taskTime" class="form-control" required>
-                        </div>
-                        <button type="button" class="primary-btn" onclick="addTask()">Add Task</button>
-                        <div id="taskSavedMessage" style="display: none;">
-                            <p>Task saved successfully!</p>
-                        </div>
-                    </form>
-                </div>
-
+<!-- Task Manager Section -->
+<div id="taskManager" class="task-manager" style="display: none;">
+<!-- Manual Text Input -->
+<div id="manualTextSection" class="task-input" style="display: none;">
+    <h2>Add New Task</h2>
+    <form id="addTaskForm">
+        <div class="form-group">
+            <label for="taskText">Task Text:</label>
+            <input type="text" id="taskText" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="priority">Priority:</label>
+            <select id="priority" class="form-select">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="taskDateTime">Task Date and Time:</label>
+            <input type="datetime-local" id="taskDateTime" class="form-control" required>
+        </div>
+        <button type="button" class="primary-btn" onclick="addTask()">Add Task</button>
+        <div id="taskSavedMessage" style="display: none;">
+            <p>Task saved successfully!</p>
+        </div>
+        <div id="output"></div>
+    </form>
+</div>
 
                 <!-- Speech to Text Input -->
                 <div id="speechToTextSection" class="task-input" style="display: none;">
@@ -345,49 +344,61 @@
         }
 
         function addTask() {
-            const taskText = document.getElementById('taskText').value.trim();
-            const priority = document.getElementById('priority').value;
-    
-            // Get current date and time
-            const currentDate = new Date().toISOString().split('T')[0];
-            const currentTime = new Date().toTimeString().split(' ')[0];
-    
-            // Prepare task data
-            const taskData = {
-                task_text: taskText,
-                priority: priority,
-                date: currentDate,
-                time: currentTime,
-                created_at: new Date().toISOString()
-            };
-    
-            // Make a POST request to the API to add the task
-            fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(taskData)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to add task');
-                    }
-                })
-                .then(data => {
-                    console.log('Task added successfully:', data.message);
-                    // Show a success message or perform any other actions
-                    document.getElementById('taskSavedMessage').style.display = 'block';
-                    // Optionally, refresh the task list
-                    fetchTasks();
-                })
-                .catch(error => {
-                    console.error('Error adding task:', error);
-                    // Show an error message or perform error handling
+    const taskText = document.getElementById('taskText').value.trim();
+    const priority = document.getElementById('priority').value;
+    const taskDateTime = document.getElementById('taskDateTime').value;
+
+    // Check if the task text and datetime are provided
+    if (taskText === '' || taskDateTime === '') {
+        // Display an error message or handle the case where inputs are missing
+        document.getElementById('output').innerText = 'Task already exists with the given date and time';
+        return;
+    }
+
+    // Prepare task data
+    const taskData = {
+        task_text: taskText,
+        priority: priority,
+        created_at: new Date(taskDateTime).toISOString()
+    };
+
+    // Make a POST request to the API to add the task
+    fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(taskData)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else if (response.status === 400) {
+                return response.json().then(data => {
+                    // Display the error message on the screen
+                    document.getElementById('taskSavedMessage').style.display = 'none';
+                    document.getElementById('addError').innerText = data.detail;
+                    document.getElementById('addError').style.color = 'red';
                 });
-        }
+            } else {
+                throw new Error('Failed to add task');
+            }
+        })
+        .then(data => {
+            if (data) {
+                console.log('Task added successfully:', data.message);
+                // Show a success message or perform any other actions
+                document.getElementById('addError').innerText = '';
+                document.getElementById('taskSavedMessage').style.display = 'block';
+                // Optionally, refresh the task list
+                fetchTasks('april');
+            }
+        })
+        .catch(error => {
+            console.error('Error adding task:', error);
+            // Show an error message or perform error handling
+        });
+}
 
         function showChat() {
             hideAllSections();
