@@ -17,9 +17,16 @@
             <p class="header-tagline">Simplify Your Tasks</p>
         </div>
     </header>
+    <!-- Toggle button -->
+    <button id="toggleMenuBtn" class="toggle-menu-btn" onclick="toggleMenu()">
+        <i></i>
+        <i></i>
+        <i></i>
+    </button>
 
     <!-- Side Menu -->
     <div id="menu" class="menu">
+        <br><br>
         <ul>
             <li><a href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
             <li><a href="#" onclick="showRegister()"><i class="fas fa-user-plus"></i> Register</a></li>
@@ -43,7 +50,7 @@
                 <h2>Login</h2>
                 <form id="loginForm">
                     <div class="form-group">
-                        
+
                         <input type="text" id="loginUsername" class="form-control" placeholder="Username" required>
                     </div>
                     <button type="button" class="primary-btn" onclick="login()">Login</button>
@@ -58,7 +65,7 @@
                 <h2>Register</h2>
                 <form id="registerForm">
                     <div class="form-group">
-                        
+
                         <input type="text" id="registerUsername" class="form-control" placeholder="Username" required>
                     </div>
                     <button type="button" class="secondary-btn" onclick="register()">Register</button>
@@ -149,7 +156,7 @@
                             <label for="updateTaskTime">Time:</label>
                             <input type="time" id="updateTaskTime" class="form-control" required>
                         </div>
-                        <button type="button" class="primary-btn" onclick="updateTask()">Update Task</button>
+                        <button type="button" class="secondary-btn" onclick="updateTask()">Update Task</button>
                     </form>
                 </div>
 
@@ -157,7 +164,7 @@
                 <!-- View Tasks Section -->
                 <div id="tasksSection" class="tasks-section" style="display: none;">
                     <h2>Your Tasks</h2>
-                    <button onclick="backToViewList()">Back to View List</button>
+                    <button onclick="backToViewList()"><b><u>Back to View List</u></b></button>
                     <div id="tasks" class="tasks"></div>
                 </div>
             </div>
@@ -173,7 +180,10 @@
     <!-- JavaScript -->
     <script>
         var username;
-
+        function toggleMenu() {
+            var menu = document.getElementById("menu");
+            menu.classList.toggle("menu-opened");
+        }
         function viewTasks(collectionName) {
             hideAllSections();
             fetchTasks(collectionName);
@@ -198,18 +208,26 @@
                 const taskItem = document.createElement('div');
                 taskItem.classList.add('task-item');
                 taskItem.innerHTML = `
-                        <p>${task.task_text}</p>
-                        <p><strong>Priority:</strong> ${task.priority}</p>
-                        <p><strong>Date:</strong> ${task.date}</p>
-                        <p><strong>Time:</strong> ${task.time}</p>
-                        <button onclick="deleteTask('${task.task_id}')">Delete</button>
-                        <button onclick="showUpdateForm('${task.task_id}', '${task.task_text}', '${task.priority}', '${task.date}', '${task.time}')">Update</button>
-                    `;
+            <p class="task-text">${task.task_text}</p>
+            <div class="task-details" style="display: none;">
+                <p><strong>Priority:</strong> ${task.priority}</p>
+                <p><strong>Date:</strong> ${task.date}</p>
+                <p><strong>Time:</strong> ${task.time}</p>
+            </div>
+            <button onclick="deleteTask('${task.task_id}')"> Delete </button>
+            <button class="secondary-btn" onclick="showUpdateForm('${task.task_id}', '${task.task_text}', '${task.priority}', '${task.date}', '${task.time}')"> Update </button>
+        `;
+                taskItem.addEventListener('click', function () {
+                    // Toggle display of task details when clicked
+                    const details = taskItem.querySelector('.task-details');
+                    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+                });
                 tasksDiv.appendChild(taskItem);
             });
 
             document.getElementById('tasksSection').style.display = 'block';
         }
+
 
         window.onload = function () {
             showLogin();
