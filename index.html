@@ -390,12 +390,12 @@ var spokenTaskDiv = document.getElementById('spokenTask');
         // Check if the taskSavedMessage element exists before attempting to modify its style
         var taskSavedMessage = document.getElementById('taskSavedMessage');
         console.log("taskSavedMessage:", taskSavedMessage); // Add this line to check the value of taskSavedMessage
+        document.getElementById('output').innerText = 'Task saved successfully'
         if (taskSavedMessage) {
             taskSavedMessage.style.display = 'block';
         }
     }
 }
-
 function addTask(taskText, priority) {
     // Get current date and time
     const currentDate = new Date().toISOString().split('T')[0];
@@ -425,6 +425,8 @@ function addTask(taskText, priority) {
     })
     .then(data => {
         console.log('Task added successfully:', data.message);
+        // Hide the loading indicator
+        document.getElementById('spokenTextLoader').style.display = 'none'; // This line should hide the loader
         // Show a success message or perform any other actions
         document.getElementById('taskSavedMessage').style.display = 'block';
         displayNotification(taskText); // Pass the spoken task text to displayNotification function
