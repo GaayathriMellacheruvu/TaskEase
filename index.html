@@ -31,7 +31,7 @@
         <ul>
             <li><a href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
             <li><a href="#" onclick="showRegister()"><i class="fas fa-user-plus"></i> Register</a></li>
-
+            <li><a href="#" onclick="showProfile()"><i class="fas fa-user"></i> Your Profile</a></li>
             <li><a href="#" onclick="showSpeechToText()"><i class="fas fa-microphone-alt"></i> Speak Your Task</a></li>
             <li><a href="#" onclick="viewCollections()"><i class="fas fa-tasks"></i> View Tasks</a></li>
             <li><a href="#" onclick="showChat()"><i class="fas fa-comments"></i> Chat</a></li>
@@ -83,6 +83,8 @@
                 </form>
             </div>
 
+            <div id="profileSection" class="profile-section" style="display: none;"></div>
+
             <!-- Task Manager Section -->
             <div id="taskManager" class="task-manager" style="display: none;">
                 <!-- Manual Text Input -->
@@ -127,7 +129,6 @@
                     <div id="spokenTextLoader" style="display: none;" class="loading"></div>
                     <!-- Inside your HTML markup -->
                     <div id="spokenTaskSavedMessage" style="display: none;">Task saved successfully!</div>
-
                 </div>
 
                 <!-- Chat Section -->
@@ -204,6 +205,15 @@
             hideAllSections();
             fetchTasks(collectionName);
         }
+
+        function showProfile() {
+            hideAllSections(); // Hide all other sections
+            // Display username and profile picture
+            const profileSection = document.getElementById('profileSection');
+            profileSection.innerHTML = `<h4>Welcome, ${username}!</h4>`;
+            profileSection.style.display = 'block'; // Show the profile section
+        }
+
 
         function fetchTasks(collectionName) {
             fetch(`https://task-ease-537o.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}`, {
@@ -325,7 +335,6 @@
             document.querySelector('.popup-message').remove();
         }
 
-
         function logout() {
             // Clear user session or perform logout actions
             username = null; // Clear the username
@@ -334,8 +343,6 @@
             // Reload the page
             window.location.reload();
         }
-
-
 
         function showCollectionsForCurrentMonth() {
             // Get current month and year
@@ -346,7 +353,6 @@
             // Fetch collections for the current month
             fetchCollections(`${currentYear}-${currentMonth}`);
         }
-
 
         // Function to register a new user
         function registerUser() {
@@ -376,9 +382,6 @@
                 alert('Please provide both username and password');
             }
         }
-
-
-
 
         var recognition;
         var spokenTaskDiv = document.getElementById('spokenTask');
@@ -450,7 +453,6 @@
             }
         }
 
-
         function addTask(taskText, priority) {
             // Get current date and time
             const currentDate = new Date().toISOString().split('T')[0];
@@ -490,7 +492,6 @@
                     // Show an error message or perform error handling
                 });
         }
-
 
         function get_collection_name() {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -548,7 +549,6 @@
                     });
             }
         }
-
 
         function viewCollections() {
             hideAllSections();
