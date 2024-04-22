@@ -31,8 +31,9 @@
         <ul>
             <li><a href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
             <li><a href="#" onclick="showRegister()"><i class="fas fa-user-plus"></i> Register</a></li>
-            <li><a href="#" onclick="showSpeechToText()"><i class="fas fa-microphone-alt"></i> Speech to Text</a></li>
-            <li><a href="#" onclick="viewCollections()"><i class="fas fa-tasks"></i> View List</a></li>
+
+            <li><a href="#" onclick="showSpeechToText()"><i class="fas fa-microphone-alt"></i> Speak Your Task</a></li>
+            <li><a href="#" onclick="viewCollections()"><i class="fas fa-tasks"></i> View Tasks</a></li>
             <li><a href="#" onclick="showChat()"><i class="fas fa-comments"></i> Chat</a></li>
             <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
@@ -84,6 +85,33 @@
 
             <!-- Task Manager Section -->
             <div id="taskManager" class="task-manager" style="display: none;">
+                <!-- Manual Text Input -->
+                <div id="manualTextSection" class="task-input" style="display: none;">
+                    <h4><b>Add New Task</b></h4>
+                    <form id="addTaskForm">
+                        <div class="form-group">
+                            <label for="taskText">Task Text:</label>
+                            <input type="text" id="taskText" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority:</label>
+                            <select id="priority" class="form-select">
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDateTime">Set Your Reminder:</label>
+                            <input type="datetime-local" id="taskDateTime" class="form-control" required>
+                        </div>
+                        <button type="button" class="primary-btn" onclick="addTask()">Add Task</button>
+                        <div id="taskSavedMessage" style="display: none;">
+                            <p>Task saved successfully!</p>
+                        </div>
+                        <div id="output"></div>
+                    </form>
+                </div>
 
                 <!-- Speech to Text Input -->
                 <div id="speechToTextSection" class="task-input" style="display: none;">
@@ -92,9 +120,14 @@
                             class="fas fa-microphone"></i></button>
                     <button type="button" class="danger-btn" onclick="stopRecording()">Stop Recording <i
                             class="fas fa-stop"></i></button>
-                    <div id="spokenTask"></div>
+                    <div id="spokenTaskContainer">
+                        <div id="spokenTask" class="spoken-task"></div>
+                    </div>
                     <button type="button" class="secondary-btn" onclick="saveSpokenTask()">Save Task</button>
                     <div id="spokenTextLoader" style="display: none;" class="loading"></div>
+                    <!-- Inside your HTML markup -->
+                    <div id="spokenTaskSavedMessage" style="display: none;">Task saved successfully!</div>
+
                 </div>
 
                 <!-- Chat Section -->
@@ -135,52 +168,62 @@
                             <label for="updateTaskDate">Date:</label>
                             <input type="date" id="updateTaskDate" class="form-control" required>
                         </div>
+                        <div class="form-group">
+                            <label for="updateTaskTime">Time:</label>
+                            <input type="time" id="updateTaskTime" class="form-control" required>
+                        </div>
                         <button type="button" class="secondary-btn" onclick="updateTask()">Update Task</button>
-                        <div id="updateTaskMessage"></div>
                     </form>
                 </div>
 
-                <!-- Task List -->
-                <div id="taskList" class="task-list"></div>
+
+                <!-- View Tasks Section -->
+                <div id="tasksSection" class="tasks-section" style="display: none;">
+                    <h2>Your Tasks</h2>
+                    <button onclick="backToViewList()"><b><u>Back to View List</u></b></button>
+                    <div id="tasks" class="tasks"></div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Notification Sound -->
+    <audio id="notificationSound" src="notification_sound.mp3"></audio>
+
+    <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.8.1/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands@0.4.0"></script>
+
+    <!-- JavaScript -->
     <script>
         var username;
+        function toggleMenu() {
+            var menu = document.getElementById("menu");
+            menu.classList.toggle("menu-opened");
+        }
+        function viewTasks(collectionName) {
+            hideAllSections();
+            fetchTasks(collectionName);
+        }
 
-function toggleMenu() {
-    var menu = document.getElementById("menu");
-    menu.classList.toggle("menu-opened");
-}
+        function fetchTasks(collectionName) {
+            fetch(`https://task-ease-537o.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}`, {
+                method: 'GET'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    displayTasks(data.tasks);
+                })
+                .catch(error => console.error('Error fetching tasks:', error));
+        }
 
-function viewTasks(collectionName) {
-    hideAllSections();
-    fetchTasks(collectionName);
-}
+        function displayTasks(tasks) {
+            const tasksDiv = document.getElementById('tasks');
+            tasksDiv.innerHTML = '';
 
-function fetchTasks(collectionName) {
-    fetch(`https://task-ease-537o.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}`, {
-            method: 'GET'
-        })
-        .then(response => response.json())
-        .then(data => {
-            displayTasks(data.tasks);
-        })
-        .catch(error => console.error('Error fetching tasks:', error));
-}
-
-function displayTasks(tasks) {
-    const tasksDiv = document.getElementById('tasks');
-    tasksDiv.innerHTML = '';
-
-    tasks.forEach(task => {
-        const taskItem = document.createElement('div');
-        taskItem.classList.add('task-item');
-        taskItem.innerHTML = `
+            tasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.classList.add('task-item');
+                taskItem.innerHTML = `
             <p class="task-text">${task.task_text}</p>
             <div class="task-details" style="display: none;">
                 <p><strong>Priority:</strong> ${task.priority}</p>
@@ -190,42 +233,42 @@ function displayTasks(tasks) {
             <button onclick="deleteTask('${task.task_id}')"> Delete </button>
             <button class="secondary-btn" onclick="showUpdateForm('${task.task_id}', '${task.task_text}', '${task.priority}', '${task.date}', '${task.time}')"> Update </button>
         `;
-        taskItem.addEventListener('click', function () {
-            // Toggle display of task details when clicked
-            const details = taskItem.querySelector('.task-details');
-            details.style.display = details.style.display === 'none' ? 'block' : 'none';
-        });
-        tasksDiv.appendChild(taskItem);
-    });
+                taskItem.addEventListener('click', function () {
+                    // Toggle display of task details when clicked
+                    const details = taskItem.querySelector('.task-details');
+                    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+                });
+                tasksDiv.appendChild(taskItem);
+            });
 
-    document.getElementById('tasksSection').style.display = 'block';
-}
+            document.getElementById('tasksSection').style.display = 'block';
+        }
 
 
-window.onload = function () {
-    showLogin();
-};
+        window.onload = function () {
+            showLogin();
+        };
 
-// Inside the showLogin() function
-function showLogin() {
-    hideAllSections();
-    document.getElementById('loginForm').style.display = 'block';
+        // Inside the showLogin() function
+        function showLogin() {
+            hideAllSections();
+            document.getElementById('loginForm').style.display = 'block';
 
-    // Add event listener to the "Forgot Password" link
-    document.getElementById('forgotPasswordLink').addEventListener('click', function (event) {
-        event.preventDefault(); // Prevent the default action of the link (i.e., navigating to its href)
-        window.location.href = 'forgot_password.html'; // Redirect the user to forgot_password.html
-    });
-}
+            // Add event listener to the "Forgot Password" link
+            document.getElementById('forgotPasswordLink').addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent the default action of the link (i.e., navigating to its href)
+                window.location.href = 'forgot_password.html'; // Redirect the user to forgot_password.html
+            });
+        }
 
-function showRegister() {
-    hideAllSections();
-    document.getElementById('registerForm').style.display = 'block';
-}
+        function showRegister() {
+            hideAllSections();
+            document.getElementById('registerForm').style.display = 'block';
+        }
 
-function login() {
+        function login() {
             var loginUsername = document.getElementById('loginUsername').value.trim();
-            var loginPassword = document.getElementById('loginPassword').value.trim(); // Add this line to get the password input
+            var loginPassword = document.getElementById('loginPassword').value.trim(); // Add this line to get the password input field
             if (loginUsername !== '' && loginPassword !== '') {
                 fetch('https://task-ease-537o.onrender.com/tasks/login/', {
                     method: 'POST',
@@ -237,104 +280,108 @@ function login() {
                         password: loginPassword // Pass the password in the request body
                     })
                 })
-                .then(response => {
-                    if (response.ok) {
-                        username = loginUsername;
-                        document.getElementById('loginMessage').innerText = 'Login successful';
-                        document.getElementById('loginMessage').style.color = 'green';
-                        document.getElementById('loginForm').style.display = 'none';
-                        document.getElementById('taskManager').style.display = 'block';
-                        // Show collections for the current month
-                        showCollectionsForCurrentMonth();
-                    } else if (response.status === 401) {
-                        document.getElementById('loginMessage').innerText = 'Login failed. Invalid credentials.';
-                        document.getElementById('loginMessage').style.color = 'red';
-                    } else {
-                        document.getElementById('loginMessage').innerText = 'Login failed. Please try again.';
-                        document.getElementById('loginMessage').style.color = 'red';
-                    }
-                })
-                .catch(error => console.error('Error logging in:', error));
+                    .then(response => {
+                        if (response.ok) {
+                            username = loginUsername;
+                            // Show the pop-up message after successful login
+                            showPopupMessage('Login successful!');
+                            // Hide the login form
+                            document.getElementById('loginForm').style.display = 'none';
+                            // Show the task manager section
+                            document.getElementById('taskManager').style.display = 'block';
+                            // Show collections for the current month
+                            showCollectionsForCurrentMonth();
+                        } else if (response.status === 401) {
+                            document.getElementById('loginMessage').innerText = 'Login failed. Invalid credentials.';
+                            document.getElementById('loginMessage').style.color = 'red';
+                        } else {
+                            document.getElementById('loginMessage').innerText = 'Login failed. Please try again.';
+                            document.getElementById('loginMessage').style.color = 'red';
+                        }
+                    })
+                    .catch(error => console.error('Error logging in:', error));
             } else {
                 alert('Please provide both username and password');
             }
         }
 
-function showPopupMessage(message) {
-    // Create a div for the pop-up message
-    const popupDiv = document.createElement('div');
-    popupDiv.classList.add('popup-message');
-    popupDiv.innerHTML = `
+        function showPopupMessage(message) {
+            // Create a div for the pop-up message
+            const popupDiv = document.createElement('div');
+            popupDiv.classList.add('popup-message');
+            popupDiv.innerHTML = `
         <div class="popup-content">
             <span class="close-btn" onclick="closePopupMessage()">&times;</span>
             <p>${message}</p>
             <button class="okay-btn" onclick="closePopupMessage()">Okay</button>
         </div>
     `;
-    // Append the pop-up div to the body
-    document.body.appendChild(popupDiv);
-}
+            // Append the pop-up div to the body
+            document.body.appendChild(popupDiv);
+        }
 
-function closePopupMessage() {
-    // Remove the pop-up message from the DOM
-    document.querySelector('.popup-message').remove();
-}
-
-
-function logout() {
-    // Clear user session or perform logout actions
-    username = null; // Clear the username
-    hideAllSections(); // Hide all sections after logout
-    showLogin(); // Show the login form again
-    // Reload the page
-    window.location.reload();
-}
+        function closePopupMessage() {
+            // Remove the pop-up message from the DOM
+            document.querySelector('.popup-message').remove();
+        }
 
 
-
-function showCollectionsForCurrentMonth() {
-    // Get current month and year
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1; // January is 0, so add 1
-    const currentYear = currentDate.getFullYear();
-
-    // Fetch collections for the current month
-    fetchCollections(`${currentYear}-${currentMonth}`);
-}
+        function logout() {
+            // Clear user session or perform logout actions
+            username = null; // Clear the username
+            hideAllSections(); // Hide all sections after logout
+            showLogin(); // Show the login form again
+            // Reload the page
+            window.location.reload();
+        }
 
 
-// Function to register a new user
-function registerUser() {
-    var username = document.getElementById('registerUsername').value.trim();
-    var password = document.getElementById('registerPassword').value.trim();
 
-    if (username !== '' && password !== '') {
-        fetch('https://task-ease-537o.onrender.com/tasks/register/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password
+        function showCollectionsForCurrentMonth() {
+            // Get current month and year
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1; // January is 0, so add 1
+            const currentYear = currentDate.getFullYear();
+
+            // Fetch collections for the current month
+            fetchCollections(`${currentYear}-${currentMonth}`);
+        }
+
+
+        // Function to register a new user
+        function registerUser() {
+            var username = document.getElementById('registerUsername').value.trim();
+            var password = document.getElementById('registerPassword').value.trim();
+
+            if (username !== '' && password !== '') {
+                fetch('https://task-ease-537o.onrender.com/tasks/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
                 })
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('User registered successfully!');
-                } else {
-                    throw new Error('Failed to register user');
-                }
-            })
-            .catch(error => console.error('Error registering user:', error));
-    } else {
-        alert('Please provide both username and password');
-    }
-}
+                    .then(response => {
+                        if (response.ok) {
+                            alert('User registered successfully!');
+                        } else {
+                            throw new Error('Failed to register user');
+                        }
+                    })
+                    .catch(error => console.error('Error registering user:', error));
+            } else {
+                alert('Please provide both username and password');
+            }
+        }
 
 
-var recognition;
-var spokenTaskDiv = document.getElementById('spokenTask');
+
+
+        var recognition;
+        var spokenTaskDiv = document.getElementById('spokenTask');
 
         function showSpeechToText() {
             hideAllSections();
@@ -380,250 +427,257 @@ var spokenTaskDiv = document.getElementById('spokenTask');
         }
 
         function saveSpokenTask() {
-    stopRecording();
+            stopRecording();
 
-    var spokenTask = spokenTaskDiv.innerText.trim();
-    if (username && spokenTask !== '') {
-        document.getElementById('spokenTextLoader').style.display = 'block';
-        addTask(spokenTask, 'spokenTextLoader'); // Here is the call to addTask
+            var spokenTask = spokenTaskDiv.innerText.trim();
+            if (username && spokenTask !== '') {
+                // Inside the saveSpokenTask() function after successfully saving the spoken task
+                document.getElementById('spokenTextLoader').style.display = 'block';
+                //document.getElementById('spokenTaskSavedMessage').style.display = 'block';
 
-        // Check if the taskSavedMessage element exists before attempting to modify its style
-        var taskSavedMessage = document.getElementById('taskSavedMessage');
-        console.log("taskSavedMessage:", taskSavedMessage); // Add this line to check the value of taskSavedMessage
-        document.getElementById('output').innerText = 'Task saved successfully'
-        if (taskSavedMessage) {
-            taskSavedMessage.style.display = 'block';
+                addTask(spokenTask, 'spokenTextLoader'); // Here is the call to addTask
+                // Display spoken task in a box
+                document.getElementById('spokenTask').innerText = spokenTask;
+                document.getElementById('spokenTaskContainer').style.display = 'block';
+                // Display a message to the user that the task is saved
+                document.getElementById('output').innerText = 'Task saved successfully';
+
+                // Check if the taskSavedMessage element exists before attempting to modify its style
+                var taskSavedMessage = document.getElementById('taskSavedMessage');
+                if (taskSavedMessage) {
+                    taskSavedMessage.style.display = 'block';
+                }
+            }
         }
-    }
-}
-function addTask(taskText, priority) {
-    // Get current date and time
-    const currentDate = new Date().toISOString().split('T')[0];
-    const currentTime = new Date().toTimeString().split(' ')[0];
-    // Prepare task data
-    const taskData = {
-        task_text: taskText,
-        priority: priority, // Use the priority passed as a parameter
-        date: currentDate,
-        time: currentTime,
-        created_at: new Date().toISOString()
-    };
-    // Make a POST request to the API to add the task
-    fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(taskData)
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error('Failed to add task');
+
+
+        function addTask(taskText, priority) {
+            // Get current date and time
+            const currentDate = new Date().toISOString().split('T')[0];
+            const currentTime = new Date().toTimeString().split(' ')[0];
+            // Prepare task data
+            const taskData = {
+                task_text: taskText,
+                priority: priority, // Use the priority passed as a parameter
+                date: currentDate,
+                time: currentTime,
+                created_at: new Date().toISOString()
+            };
+            // Make a POST request to the API to add the task
+            fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(taskData)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to add task');
+                    }
+                })
+                .then(data => {
+                    console.log('Task added successfully:', data.message);
+                    // Hide the loading indicator
+                    document.getElementById('spokenTextLoader').style.display = 'none'; // This line should hide the loader
+                    // Show a success message or perform any other actions
+                    document.getElementById('spokenTaskSavedMessage').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error adding task:', error);
+                    // Show an error message or perform error handling
+                });
         }
-    })
-    .then(data => {
-        console.log('Task added successfully:', data.message);
-        // Hide the loading indicator
-        document.getElementById('spokenTextLoader').style.display = 'none'; // This line should hide the loader
-        // Show a success message or perform any other actions
-        document.getElementById('taskSavedMessage').style.display = 'block';
-        displayNotification(taskText); // Pass the spoken task text to displayNotification function
-        fetchTasks(); // Optionally, refresh the task list
-    })
-    .catch(error => {
-        console.error('Error adding task:', error);
-        // Show an error message or perform error handling
-    });
-}
 
 
-function get_collection_name() {
-    const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-    const currentDate = new Date();
-    return months[currentDate.getMonth()];
-}
+        function get_collection_name() {
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const currentDate = new Date();
+            return months[currentDate.getMonth()];
+        }
 
 
-function showChat() {
-    hideAllSections();
-    document.getElementById('chatSection').style.display = 'block';
-}
+        function showChat() {
+            hideAllSections();
+            document.getElementById('chatSection').style.display = 'block';
+        }
 
-function viewTasks(collectionName) {
-    hideAllSections();
-    fetchTasks(collectionName);
-}
+        function viewTasks(collectionName) {
+            hideAllSections();
+            fetchTasks(collectionName);
+        }
 
-function hideAllSections() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('chatSection').style.display = 'none';
-    document.getElementById('speechToTextSection').style.display = 'none';
-    document.getElementById('collectionsSection').style.display = 'none'; // Hide collections section
-}
+        function hideAllSections() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('manualTextSection').style.display = 'none';
+            document.getElementById('chatSection').style.display = 'none';
+            document.getElementById('speechToTextSection').style.display = 'none';
+            document.getElementById('collectionsSection').style.display = 'none'; // Hide collections section
+        }
 
-function chatWithAssistant() {
-    const chatInput = document.getElementById('chatInput').value.trim();
-    if (chatInput !== '') {
-        document.getElementById('chatLoader').style.display = 'block';
+        function chatWithAssistant() {
+            const chatInput = document.getElementById('chatInput').value.trim();
+            if (chatInput !== '') {
+                document.getElementById('chatLoader').style.display = 'block';
 
-        // Construct the URL with query parameters
-        const url = `https://task-ease-537o.onrender.com/tasks/chat_with_chatbot?user_input=${encodeURIComponent(chatInput)}&username=${encodeURIComponent(username)}&collection_name=april`;
+                // Construct the URL with query parameters
+                const url = `https://task-ease-537o.onrender.com/tasks/chat_with_chatbot?user_input=${encodeURIComponent(chatInput)}&username=${encodeURIComponent(username)}&collection_name=april`;
 
-        // Make a POST request to the API to chat with the chatbot
-        fetch(url, {
-                method: 'POST'
+                // Make a POST request to the API to chat with the chatbot
+                fetch(url, {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Display the response from the server in the chat output area
+                        // Inside the function where you display the response from the chatbot
+                        document.getElementById('chatOutput').innerHTML = `<div class="chatbot-response">${data.response}</div>`;
+
+                        // Clear the input field
+                        document.getElementById('chatInput').value = '';
+                    })
+                    .catch(error => {
+                        console.error('Error chatting with assistant:', error);
+                    })
+                    .finally(() => {
+                        // Hide the loading indicator after the request completes
+                        document.getElementById('chatLoader').style.display = 'none';
+                    });
+            }
+        }
+
+
+        function viewCollections() {
+            hideAllSections();
+            fetchCollections();
+        }
+
+        function fetchCollections() {
+            fetch(`https://task-ease-537o.onrender.com/tasks/collections/${username}`, {
+                method: 'GET'
             })
-            .then(response => response.json())
-            .then(data => {
-                // Display the response from the server in the chat output area
-                // Inside the function where you display the response from the chatbot
-                document.getElementById('chatOutput').innerHTML = `<div class="chatbot-response">${data.response}</div>`;
+                .then(response => response.json())
+                .then(data => {
+                    displayCollections(data.collections);
+                })
+                .catch(error => console.error('Error fetching collections:', error));
+        }
 
-                // Clear the input field
-                document.getElementById('chatInput').value = '';
-            })
-            .catch(error => {
-                console.error('Error chatting with assistant:', error);
-            })
-            .finally(() => {
-                // Hide the loading indicator after the request completes
-                document.getElementById('chatLoader').style.display = 'none';
+        function displayCollections(collections) {
+            const collectionsDiv = document.getElementById('collections');
+            collectionsDiv.innerHTML = '';
+
+            collections.forEach(collection => {
+                const collectionItem = document.createElement('div');
+                collectionItem.classList.add('collection-item');
+                collectionItem.innerHTML = `
+                        <p>${collection}</p>
+                        <button type="button" class="primary-btn" onclick="viewTasks('${collection}')">View Tasks</button>                        
+                    `;
+                collectionsDiv.appendChild(collectionItem);
             });
-    }
-}
 
+            document.getElementById('collectionsSection').style.display = 'block';
+        }
 
-function viewCollections() {
-    hideAllSections();
-    fetchCollections();
-}
+        function displayNotification(taskText) {
+            // Play notification sound
+            var notificationSound = document.getElementById('notificationSound');
+            notificationSound.play();
 
-function fetchCollections() {
-    fetch(`https://task-ease-537o.onrender.com/tasks/collections/${username}`, {
-            method: 'GET'
-        })
-        .then(response => response.json())
-        .then(data => {
-            displayCollections(data.collections);
-        })
-        .catch(error => console.error('Error fetching collections:', error));
-}
-
-function displayCollections(collections) {
-    const collectionsDiv = document.getElementById('collections');
-    collectionsDiv.innerHTML = '';
-
-    collections.forEach(collection => {
-        const collectionItem = document.createElement('div');
-        collectionItem.classList.add('collection-item');
-        collectionItem.innerHTML = `
-            <p>${collection}</p>
-            <button type="button" class="primary-btn" onclick="viewTasks('${collection}')">View Tasks</button>                        
-        `;
-        collectionsDiv.appendChild(collectionItem);
-    });
-
-    document.getElementById('collectionsSection').style.display = 'block';
-}
-
-function displayNotification(taskText) {
-    // Play notification sound
-    var notificationSound = document.getElementById('notificationSound');
-    notificationSound.play();
-
-    // Display notification
-    if (Notification.permission === 'granted') {
-        new Notification('Task Reminder', {
-            body: taskText,
-            icon: 'notification_icon.png' // Path to your notification icon
-        });
-    } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
+            // Display notification
+            if (Notification.permission === 'granted') {
                 new Notification('Task Reminder', {
                     body: taskText,
                     icon: 'notification_icon.png' // Path to your notification icon
                 });
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification('Task Reminder', {
+                            body: taskText,
+                            icon: 'notification_icon.png' // Path to your notification icon
+                        });
+                    }
+                });
             }
-        });
-    }
-}
+        }
 
-function deleteTask(taskId) {
-    fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}`, {
-            method: 'DELETE'
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('Task deleted successfully');
-                // Optionally, refresh tasks after deletion
-                fetchTasks('april');
-            } else {
-                console.error('Error deleting task:', response.statusText);
-            }
-        })
-        .catch(error => console.error('Error deleting task:', error));
-}
+        function deleteTask(taskId) {
+            fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Task deleted successfully');
+                        // Optionally, refresh tasks after deletion
+                        fetchTasks('april');
+                    } else {
+                        console.error('Error deleting task:', response.statusText);
+                    }
+                })
+                .catch(error => console.error('Error deleting task:', error));
+        }
 
-function backToViewList() {
-    document.getElementById('tasksSection').style.display = 'none';
-    document.getElementById('collectionsSection').style.display = 'block';
-}
+        function backToViewList() {
+            document.getElementById('tasksSection').style.display = 'none';
+            document.getElementById('collectionsSection').style.display = 'block';
+        }
 
-function showUpdateForm(taskId, taskText, priority, taskDate, taskTime) {
-    // Populate the update form fields with the task details
-    document.getElementById('updateTaskId').value = taskId;
-    document.getElementById('updateTaskText').value = taskText;
-    document.getElementById('updatePriority').value = priority;
-    document.getElementById('updateTaskDate').value = taskDate;
-    document.getElementById('updateTaskTime').value = taskTime;
+        function showUpdateForm(taskId, taskText, priority, taskDate, taskTime) {
+            // Populate the update form fields with the task details
+            document.getElementById('updateTaskId').value = taskId;
+            document.getElementById('updateTaskText').value = taskText;
+            document.getElementById('updatePriority').value = priority;
+            document.getElementById('updateTaskDate').value = taskDate;
+            document.getElementById('updateTaskTime').value = taskTime;
 
-    document.getElementById('updateTaskId').style.display = 'none';
+            document.getElementById('updateTaskId').style.display = 'none';
 
-    // Show the update form
-    document.getElementById('updateTaskForm').style.display = 'block';
-}
+            // Show the update form
+            document.getElementById('updateTaskForm').style.display = 'block';
+        }
 
-function updateTask() {
-    const taskId = document.getElementById('updateTaskId').value;
-    const taskText = document.getElementById('updateTaskText').value.trim();
-    const priority = document.getElementById('updatePriority').value;
-    const taskDate = document.getElementById('updateTaskDate').value;
-    const taskTime = document.getElementById('updateTaskTime').value;
+        function updateTask() {
+            const taskId = document.getElementById('updateTaskId').value;
+            const taskText = document.getElementById('updateTaskText').value.trim();
+            const priority = document.getElementById('updatePriority').value;
+            const taskDate = document.getElementById('updateTaskDate').value;
+            const taskTime = document.getElementById('updateTaskTime').value;
 
-    // Prepare updated task data
-    const updatedTaskData = {
-        task_text: taskText,
-        priority: priority,
-        date: taskDate,
-        time: taskTime,
-        created_at: new Date().toISOString() // Include the updated created_at timestamp
-    };
+            // Prepare updated task data
+            const updatedTaskData = {
+                task_text: taskText,
+                priority: priority,
+                date: taskDate,
+                time: taskTime,
+                created_at: new Date().toISOString() // Include the updated created_at timestamp
+            };
 
-    // Make a PUT request to update the task
-    fetch(`https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}&collection_name=april`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedTaskData)
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('Task updated successfully');
-                // Optionally, refresh tasks after updating
-                fetchTasks('april');
-                // Hide the update form
-                document.getElementById('updateTaskForm').style.display = 'none';
-            } else {
-                console.error('Error updating task:', response.statusText);
-            }
-        })
-        .catch(error => console.error('Error updating task:', error));
-}
+            // Make a PUT request to update the task
+            fetch(`https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}&collection_name=april`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedTaskData)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Task updated successfully');
+                        // Optionally, refresh tasks after updating
+                        fetchTasks('april');
+                        // Hide the update form
+                        document.getElementById('updateTaskForm').style.display = 'none';
+                    } else {
+                        console.error('Error updating task:', response.statusText);
+                    }
+                })
+                .catch(error => console.error('Error updating task:', error));
+        }
 
     </script>
 </body>
