@@ -99,7 +99,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="taskDateTime">Set Your Reminder</label>
+                            <label for="taskDateTime">Task Date and Time:</label>
                             <input type="datetime-local" id="taskDateTime" class="form-control" required>
                         </div>
                         <button type="button" class="primary-btn" onclick="addTask()">Add Task</button>
@@ -409,61 +409,68 @@
         }
 
         function addTask() {
-            const taskText = document.getElementById('taskText').value.trim();
-            const priority = document.getElementById('priority').value;
-            const taskDateTime = document.getElementById('taskDateTime').value;
+    const taskText = document.getElementById('taskText').value.trim();
+    const priority = document.getElementById('priority').value;
+    const taskDateTime = document.getElementById('taskDateTime').value;
 
-            // Check if the task text and datetime are provided
-            if (taskText === '' || taskDateTime === '') {
-                // Display an error message or handle the case where inputs are missing
-                document.getElementById('output').innerText = 'Task already exists with the given date and time';
-                return;
-            }
+    // Parse date and time separately
+    const [date, time] = taskDateTime.split('T');
 
-            // Prepare task data
-            const taskData = {
-                task_text: taskText,
-                priority: priority,
-                created_at: new Date(taskDateTime).toISOString()
-            };
+    // Construct the task object with date and time fields
+    const task = {
+        task_text: taskText,
+        priority: priority,
+        date: date,
+        time: time,
+        created_at: new Date().toISOString() // Assuming created_at is set to current datetime
+    };
 
-            // Make a POST request to the API to add the task
-            fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(taskData)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else if (response.status === 400) {
-                        return response.json().then(data => {
-                            // Display the error message on the screen
-                            document.getElementById('taskSavedMessage').style.display = 'none';
-                            document.getElementById('addError').innerText = data.detail;
-                            document.getElementById('addError').style.color = 'red';
-                        });
-                    } else {
-                        throw new Error('Failed to add task');
-                    }
-                })
-                .then(data => {
-                    if (data) {
-                        console.log('Task added successfully:', data.message);
-                        // Show a success message or perform any other actions
-                        document.getElementById('addError').innerText = '';
-                        document.getElementById('taskSavedMessage').style.display = 'block';
-                        // Optionally, refresh the task list
-                        fetchTasks('april');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error adding task:', error);
-                    // Show an error message or perform error handling
-                });
+    // Check if the task text is provided
+    if (taskText === '') {
+        // Display an error message or handle the case where the task text is missing
+        document.getElementById('output').innerText = 'Task text is required';
+        return;
+    }
+
+    // Make a POST request to the API to add the task
+    fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(task)
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else if (response.status === 400) {
+            return response.json().then(data => {
+                // Display the error message on the screen
+                document.getElementById('taskSavedMessage').style.display = 'none';
+                document.getElementById('addError').innerText = data.detail;
+                document.getElementById('addError').style.color = 'red';
+            });
+        } else {
+            throw new Error('Failed to add task');
         }
+    })
+    .then(data => {
+        if (data) {
+            console.log('Task added successfully:', data.message);
+            document.getElementById('output').innerText = 'Task added successfully'
+            // Show a success message or perform any other actions
+            document.getElementById('addError').innerText = '';
+            document.getElementById('taskSavedMessage').style.display = 'block';
+            // Optionally, refresh the task list
+            fetchTasks('april');
+        }
+    })
+    .catch(error => {
+        console.error('Error adding task:', error);
+        // Show an error message or perform error handling
+    });
+}
+
 
         function showChat() {
             hideAllSections();
