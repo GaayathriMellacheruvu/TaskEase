@@ -28,10 +28,10 @@
     <!-- Side Menu -->
     <div id="menu" class="menu">
         <br><br>
+        
         <ul>
             <li><a href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
             <li><a href="#" onclick="showRegister()"><i class="fas fa-user-plus"></i> Register</a></li>
-            <li><a href="#" onclick="showProfile()"><i class="fas fa-user"></i> Your Profile</a></li>
             <li><a href="#" onclick="showSpeechToText()"><i class="fas fa-microphone-alt"></i> Speak Your Task</a></li>
             <li><a href="#" onclick="viewCollections()"><i class="fas fa-tasks"></i> View Tasks</a></li>
             <li><a href="#" onclick="showChat()"><i class="fas fa-comments"></i> Chat</a></li>
@@ -83,36 +83,12 @@
                 </form>
             </div>
 
-            <div id="profileSection" class="profile-section" style="display: none;"></div>
+            
 
             <!-- Task Manager Section -->
             <div id="taskManager" class="task-manager" style="display: none;">
                 <!-- Manual Text Input -->
                 <div id="manualTextSection" class="task-input" style="display: none;">
-                    <h4><b>Add New Task</b></h4>
-                    <form id="addTaskForm">
-                        <div class="form-group">
-                            <label for="taskText">Task Text:</label>
-                            <input type="text" id="taskText" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="priority">Priority:</label>
-                            <select id="priority" class="form-select">
-                                <option value="Low">Low</option>
-                                <option value="Medium">Medium</option>
-                                <option value="High">High</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskDateTime">Set Your Reminder:</label>
-                            <input type="datetime-local" id="taskDateTime" class="form-control" required>
-                        </div>
-                        <button type="button" class="primary-btn" onclick="addTask()">Add Task</button>
-                        <div id="taskSavedMessage" style="display: none;">
-                            <p>Task saved successfully!</p>
-                        </div>
-                        <div id="output"></div>
-                    </form>
                 </div>
 
                 <!-- Speech to Text Input -->
@@ -204,14 +180,6 @@
         function viewTasks(collectionName) {
             hideAllSections();
             fetchTasks(collectionName);
-        }
-
-        function showProfile() {
-            hideAllSections(); // Hide all other sections
-            // Display username and profile picture
-            const profileSection = document.getElementById('profileSection');
-            profileSection.innerHTML = `<h4>Welcome, ${username}!</h4>`;
-            profileSection.style.display = 'block'; // Show the profile section
         }
 
 
@@ -323,6 +291,7 @@
         <div class="popup-content">
             <span class="close-btn" onclick="closePopupMessage()">&times;</span>
             <p>${message}</p>
+            <p>Welcome, <b>${username}</b>!</p>
             <button class="okay-btn" onclick="closePopupMessage()">Okay</button>
         </div>
     `;
