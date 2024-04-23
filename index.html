@@ -28,7 +28,7 @@
     <!-- Side Menu -->
     <div id="menu" class="menu">
         <br><br>
-        
+
         <ul>
             <li><a href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
             <li><a href="#" onclick="showRegister()"><i class="fas fa-user-plus"></i> Register</a></li>
@@ -83,7 +83,7 @@
                 </form>
             </div>
 
-            
+
 
             <!-- Task Manager Section -->
             <div id="taskManager" class="task-manager" style="display: none;">
@@ -208,8 +208,10 @@
                 <p><strong>Date:</strong> ${task.date}</p>
                 <p><strong>Time:</strong> ${task.time}</p>
             </div>
-            <button onclick="deleteTask('${task.task_id}')"> Delete </button>
-            <button class="secondary-btn" onclick="showUpdateForm('${task.task_id}', '${task.task_text}', '${task.priority}', '${task.date}', '${task.time}')"> Update </button>
+            <div class="button-container">
+            <button onclick="deleteTask('${task.task_id}')">Delete</button>
+            <button class="secondary-btn" onclick="showUpdateForm('${task.task_id}', '${task.task_text}', '${task.priority}', '${task.date}', '${task.time}')">Update</button>
+            </div>
         `;
                 taskItem.addEventListener('click', function () {
                     // Toggle display of task details when clicked
