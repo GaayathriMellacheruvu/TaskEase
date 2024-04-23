@@ -62,7 +62,7 @@
                     <div id="loginMessage"></div>
                     <br>
                     <p>Don't have an account? <a href="#" onclick="showRegister()">Register here</a>.</p>
-                    <a href="#" id="forgotPasswordLink" onclick="forgotPassword()">Reset here</a>
+                    <p>Forgot password? <a href="#" id="forgotPasswordLink" onclick="forgotPassword()">Reset here</a>.</p>
                 </form>
             </div>
 
@@ -424,18 +424,21 @@
             }
         }
 
-        function addTask(taskText, priority) {
+        function addTask(taskText, loaderId) {
             // Get current date and time
             const currentDate = new Date().toISOString().split('T')[0];
             const currentTime = new Date().toTimeString().split(' ')[0];
+            const priority = 'Medium'; // Set priority to Medium
+
             // Prepare task data
             const taskData = {
                 task_text: taskText,
-                priority: priority, // Use the priority passed as a parameter
+                priority: priority,
                 date: currentDate,
                 time: currentTime,
                 created_at: new Date().toISOString()
             };
+
             // Make a POST request to the API to add the task
             fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
                 method: 'POST',
@@ -454,7 +457,7 @@
                 .then(data => {
                     console.log('Task added successfully:', data.message);
                     // Hide the loading indicator
-                    document.getElementById('spokenTextLoader').style.display = 'none'; // This line should hide the loader
+                    document.getElementById(loaderId).style.display = 'none';
                     // Show a success message or perform any other actions
                     document.getElementById('spokenTaskSavedMessage').style.display = 'block';
                 })
