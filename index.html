@@ -62,7 +62,8 @@
                     <div id="loginMessage"></div>
                     <br>
                     <p>Don't have an account? <a href="#" onclick="showRegister()">Register here</a>.</p>
-                    <p>Forgot password? <a href="#" id="forgotPasswordLink" onclick="forgotPassword()">Reset here</a>.</p>
+                    <p>Forgot password? <a href="#" id="forgotPasswordLink" onclick="forgotPassword()">Reset here</a>.
+                    </p>
                 </form>
             </div>
 
@@ -201,28 +202,90 @@
             tasks.forEach(task => {
                 const taskItem = document.createElement('div');
                 taskItem.classList.add('task-item');
-                taskItem.innerHTML = `
-            <p class="task-text">${task.task_text}</p>
-            <div class="task-details" style="display: none;">
-                <p><strong>Priority:</strong> ${task.priority}</p>
-                <p><strong>Date:</strong> ${task.date}</p>
-                <p><strong>Time:</strong> ${task.time}</p>
-            </div>
-            <div class="button-container">
-            <button onclick="deleteTask('${task.task_id}')">Delete</button>
-            <button class="secondary-btn" onclick="showUpdateForm('${task.task_id}', '${task.task_text}', '${task.priority}', '${task.date}', '${task.time}')">Update</button>
-            </div>
+
+                const taskContent = document.createElement('div');
+                taskContent.classList.add('task-content');
+                taskContent.innerHTML = `
+            <label class="task-text ${task.completed ? 'completed' : ''}">${task.task_text}</label>
+            <input type="checkbox" id="taskCheckbox_${task.task_id}" name="taskCheckbox" data-task-id="${task.task_id}" ${task.completed || localStorage.getItem(`task_${task.task_id}_checked`) === 'true' ? 'checked' : ''}>
         `;
-                taskItem.addEventListener('click', function () {
-                    // Toggle display of task details when clicked
-                    const details = taskItem.querySelector('.task-details');
-                    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+
+                const detailsDiv = document.createElement('div');
+                detailsDiv.classList.add('task-details');
+                detailsDiv.innerHTML = `
+            <p><strong>Priority:</strong> ${task.priority}</p>
+            <p><strong>Date:</strong> ${task.date}</p>
+            <p><strong>Time:</strong> ${task.time}</p>
+        `;
+                detailsDiv.style.display = 'none';
+
+                const checkbox = taskContent.querySelector('input[type="checkbox"]');
+                checkbox.addEventListener('change', function () {
+                    const taskId = this.dataset.taskId;
+                    const completed = this.checked;
+                    localStorage.setItem(`task_${taskId}_checked`, completed);
+                    if (completed) {
+                        taskContent.querySelector('.task-text').classList.add('completed');
+                    } else {
+                        taskContent.querySelector('.task-text').classList.remove('completed');
+                    }
                 });
+
+                taskItem.appendChild(taskContent);
+                taskItem.appendChild(detailsDiv);
+
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.classList.add('task-buttons');
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    deleteTask(task.task_id);
+                });
+                buttonsDiv.appendChild(deleteButton);
+
+                const updateButton = document.createElement('button');
+                updateButton.textContent = 'Update';
+                updateButton.classList.add('secondary-btn');
+                updateButton.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    showUpdateForm(task.task_id, task.task_text, task.priority, task.date, task.time);
+                });
+                buttonsDiv.appendChild(updateButton);
+
+                taskItem.appendChild(buttonsDiv);
+
+                taskItem.addEventListener('click', function (event) {
+                    if (event.target.type !== 'checkbox') {
+                        const details = taskItem.querySelector('.task-details');
+                        details.style.display = details.style.display === 'none' ? 'block' : 'none';
+                    }
+                });
+
                 tasksDiv.appendChild(taskItem);
             });
 
             document.getElementById('tasksSection').style.display = 'block';
         }
+
+
+        function updateTaskCompletion(taskId, completed) {
+            fetch('mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ taskId, completed })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update task completion');
+                    }
+                })
+                .catch(error => console.error('Error updating task completion:', error));
+        }
+
 
 
         window.onload = function () {
