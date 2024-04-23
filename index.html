@@ -28,8 +28,9 @@
     <!-- Side Menu -->
     <div id="menu" class="menu">
         <br><br>
-
+        <br>
         <ul>
+            <li><a href="#" onclick="showProfile()"><i class="fas fa-user"></i> Your Profile</a></li>
             <li><a href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
             <li><a href="#" onclick="showRegister()"><i class="fas fa-user-plus"></i> Register</a></li>
             <li><a href="#" onclick="showSpeechToText()"><i class="fas fa-microphone-alt"></i> Speak Your Task</a></li>
@@ -38,10 +39,12 @@
             <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </div>
-
+    
     <!-- Main Content -->
     <div id="content" class="content">
         <div id="container" class="container">
+            <div id="profileSection" class="profile-section" style="display: none;"></div>
+
             <div id="collectionsSection" class="collections-section" style="display: none;">
                 <h5><b>COLLECTIONS</b></h5>
                 <div id="collections" class="collections"></div>
@@ -79,12 +82,13 @@
                         <input type="password" id="registerPassword" class="form-control" placeholder="Password"
                             required>
                     </div>
+                    <div class="form-group">
+                        <input type="email" id="registerEmail" class="form-control" placeholder="Email" required>
+                    </div>
                     <button type="button" class="secondary-btn" onclick="registerUser()">Register</button>
                     <div id="registerMessage"></div>
                 </form>
             </div>
-
-
 
             <!-- Task Manager Section -->
             <div id="taskManager" class="task-manager" style="display: none;">
@@ -183,6 +187,13 @@
             fetchTasks(collectionName);
         }
 
+        function showProfile() {
+            hideAllSections(); // Hide all other sections
+            // Display username and profile picture
+            const profileSection = document.getElementById('profileSection');
+            profileSection.innerHTML = `<img src="profile_picture.jpg" alt="Profile Picture"><h2>${username}</h2>`;
+            profileSection.style.display = 'block'; // Show the profile section
+        }
 
         function fetchTasks(collectionName) {
             fetch(`https://task-ease-537o.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}`, {
@@ -388,12 +399,12 @@
             fetchCollections(`${currentYear}-${currentMonth}`);
         }
 
-        // Function to register a new user
         function registerUser() {
             var username = document.getElementById('registerUsername').value.trim();
             var password = document.getElementById('registerPassword').value.trim();
+            var email = document.getElementById('registerEmail').value.trim();
 
-            if (username !== '' && password !== '') {
+            if (username !== '' && password !== '' && email !== '') {
                 fetch('https://task-ease-537o.onrender.com/tasks/register/', {
                     method: 'POST',
                     headers: {
@@ -401,19 +412,26 @@
                     },
                     body: JSON.stringify({
                         username: username,
-                        password: password
+                        password: password,
+                        email: email
                     })
                 })
                     .then(response => {
                         if (response.ok) {
-                            alert('User registered successfully!');
+                            // Registration successful
+                            document.getElementById('registerMessage').innerText = 'Registration successful!';
+                            document.getElementById('registerMessage').style.color = 'green';
+                            // You can redirect the user to another page or perform other actions here
+                            window.location.href = 'index.html';
                         } else {
-                            throw new Error('Failed to register user');
+                            // Registration failed
+                            document.getElementById('registerMessage').innerText = 'Registration failed. Please try again.';
+                            document.getElementById('registerMessage').style.color = 'red';
                         }
                     })
                     .catch(error => console.error('Error registering user:', error));
             } else {
-                alert('Please provide both username and password');
+                alert('Please provide username, password, and email.');
             }
         }
 
@@ -548,6 +566,7 @@
         }
 
         function hideAllSections() {
+            document.getElementById('profileSection').style.display = 'none';
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('manualTextSection').style.display = 'none';
