@@ -126,10 +126,11 @@
                 <div class="task-input" id="chatSection" style="display: none;">
                     <!-- Chat input -->
                     <label for="chatInput"><b>Chat with the Task Manager:</b></label>
-                    <input type="text" id="chatInput" class="form-control" placeholder="Type your message here...">
-                    <br>
-                    <button type="button" class="primary-btn" onclick="chatWithAssistant()">Send <i
-                            class="fas fa-paper-plane"></i></button>
+                    <div class="input-group mb-3">
+                        <input type="text" id="chatInput" class="form-control" placeholder="Type your message here...">
+                        <button type="button" class="primary-btn" onclick="chatWithAssistant()">Send <i
+                                class="fas fa-paper-plane"></i></button>
+                    </div>
                     <div id="chatOutput"></div>
                     <div id="chatLoader" style="display: none;" class="loading"></div>
                     <div>
