@@ -30,13 +30,13 @@
         <br><br>
         <br>
         <ul>
-            <li><a href="#" onclick="showProfile()"><i class="fas fa-user"></i> Your Profile</a></li>
-            <li><a href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-            <li><a href="#" onclick="showRegister()"><i class="fas fa-user-plus"></i> Register</a></li>
-            <li><a href="#" onclick="showSpeechToText()"><i class="fas fa-microphone-alt"></i> Speak Your Task</a></li>
-            <li><a href="#" onclick="viewCollections()"><i class="fas fa-tasks"></i> View Tasks</a></li>
-            <li><a href="#" onclick="showChat()"><i class="fas fa-comments"></i> Chat</a></li>
-            <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <li><a href="#" onclick="showProfile(); closeMenu()"><i class="fas fa-user"></i> Your Profile</a></li>
+            <li><a href="#" onclick="showLogin(); closeMenu()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            <li><a href="#" onclick="showRegister(); closeMenu()"><i class="fas fa-user-plus"></i> Register</a></li>
+            <li><a href="#" onclick="showSpeechToText(); closeMenu()"><i class="fas fa-microphone-alt"></i> Speak Your Task</a></li>
+            <li><a href="#" onclick="viewCollections(); closeMenu()"><i class="fas fa-tasks"></i> View Tasks</a></li>
+            <li><a href="#" onclick="showChat(); closeMenu()"><i class="fas fa-comments"></i> Chat</a></li>
+            <li><a href="#" onclick="logout(); closeMenu()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </div>
 
@@ -202,14 +202,10 @@
             menu.classList.toggle("menu-opened");
         }
 
-        // Close menu when clicked anywhere on the screen
-        document.body.addEventListener('click', function (event) {
+        function closeMenu() {
             var menu = document.getElementById("menu");
-            var toggleBtn = document.getElementById("toggleMenuBtn");
-            if (!menu.contains(event.target) && event.target !== toggleBtn) {
-                menu.classList.remove("menu-opened");
-            }
-        });
+            menu.classList.remove("menu-opened");
+        }
 
 
         function viewTasks(collectionName) {
