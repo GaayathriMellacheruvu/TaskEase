@@ -39,7 +39,7 @@
             <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </div>
-    
+
     <!-- Main Content -->
     <div id="content" class="content">
         <div id="container" class="container">
@@ -106,10 +106,20 @@
                     <div id="spokenTaskContainer">
                         <div id="spokenTask" class="spoken-task"></div>
                     </div>
+                    <div>
+                        <label><b>Set Notification Reminder</b></label>
+                        <form id="notificationForm">
+                            <label for="notificationDateTime">Enter Date and Time:</label>
+                            <input type="datetime-local" id="notificationDateTime" name="notificationDateTime">
+                            <button class="notifbtn" type="submit">Set Notification</button>
+                        </form>
+                    </div>
                     <button type="button" class="secondary-btn" onclick="saveSpokenTask()">Save Task</button>
+
                     <div id="spokenTextLoader" style="display: none;" class="loading"></div>
                     <!-- Inside your HTML markup -->
                     <div id="spokenTaskSavedMessage" style="display: none;">Task saved successfully!</div>
+
                 </div>
 
                 <!-- Chat Section -->
@@ -122,11 +132,19 @@
                             class="fas fa-paper-plane"></i></button>
                     <div id="chatOutput"></div>
                     <div id="chatLoader" style="display: none;" class="loading"></div>
-
+                    <div>
+                        <form id="chatNotificationForm">
+                            <label for="chatNotificationDateTime">Enter Date and Time:</label>
+                            <input type="datetime-local" id="chatNotificationDateTime" name="notificationDateTime">
+                            <button class="notifbtn" type="submit">Set Notification</button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Update Task Form -->
                 <div id="updateTaskForm" class="task-input" style="display: none;">
+                    <button class="updateBackButton" onclick="viewCollections()"
+                        style='font-size:40px;'>&#8592;</button>
                     <h2>Update Task</h2>
                     <form id="updateTaskForm">
                         <!-- Disable the input field for task_id -->
@@ -178,10 +196,22 @@
     <!-- JavaScript -->
     <script>
         var username;
+
         function toggleMenu() {
             var menu = document.getElementById("menu");
             menu.classList.toggle("menu-opened");
         }
+
+        // Close menu when clicked anywhere on the screen
+        document.body.addEventListener('click', function (event) {
+            var menu = document.getElementById("menu");
+            var toggleBtn = document.getElementById("toggleMenuBtn");
+            if (!menu.contains(event.target) && event.target !== toggleBtn) {
+                menu.classList.remove("menu-opened");
+            }
+        });
+
+
         function viewTasks(collectionName) {
             hideAllSections();
             fetchTasks(collectionName);
@@ -511,6 +541,16 @@
             const currentTime = new Date().toTimeString().split(' ')[0];
             const priority = 'Medium'; // Set priority to Medium
 
+            // Extract date and time from task text using regex
+            const dateRegex = /(\d{4}-\d{2}-\d{2})/;
+            const timeRegex = /(\d{2}:\d{2}:\d{2})/;
+            const extractedDate = taskText.match(dateRegex);
+            const extractedTime = taskText.match(timeRegex);
+
+            // If date and time are provided in taskText, use them, otherwise use current date and time
+            const taskDate = extractedDate ? extractedDate[0] : currentDate;
+            const taskTime = extractedTime ? extractedTime[0] : currentTime;
+
             // Prepare task data
             const taskData = {
                 task_text: taskText,
@@ -573,6 +613,8 @@
             document.getElementById('chatSection').style.display = 'none';
             document.getElementById('speechToTextSection').style.display = 'none';
             document.getElementById('collectionsSection').style.display = 'none'; // Hide collections section
+            document.getElementById('tasksSection').style.display = 'none';
+            document.getElementById('updateTaskForm').style.display = 'none';
         }
 
         function chatWithAssistant() {
@@ -639,28 +681,66 @@
             document.getElementById('collectionsSection').style.display = 'block';
         }
 
-        function displayNotification(taskText) {
-            // Play notification sound
-            var notificationSound = document.getElementById('notificationSound');
-            notificationSound.play();
+        //Notifications function
+        document.getElementById('notificationForm').addEventListener('submit', function (event) {
+            event.preventDefault();
 
-            // Display notification
-            if (Notification.permission === 'granted') {
-                new Notification('Task Reminder', {
-                    body: taskText,
-                    icon: 'notification_icon.png' // Path to your notification icon
-                });
-            } else if (Notification.permission !== 'denied') {
-                Notification.requestPermission().then(permission => {
+            const notificationDateTime = document.getElementById('notificationDateTime').value;
+
+            if (Notification.permission !== 'granted') {
+                Notification.requestPermission().then(function (permission) {
                     if (permission === 'granted') {
-                        new Notification('Task Reminder', {
-                            body: taskText,
-                            icon: 'notification_icon.png' // Path to your notification icon
-                        });
+                        setNotification(notificationDateTime);
                     }
                 });
+            } else {
+                setNotification(notificationDateTime);
+            }
+        });
+        document.getElementById('chatNotificationForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const notificationDateTime = document.getElementById('chatNotificationDateTime').value;
+
+            if (Notification.permission !== 'granted') {
+                Notification.requestPermission().then(function (permission) {
+                    if (permission === 'granted') {
+                        setNotification(notificationDateTime);
+                    }
+                });
+            } else {
+                setNotification(notificationDateTime);
+            }
+        });
+
+
+        function setNotification(dateTime) {
+            const notificationTime = new Date(dateTime).getTime();
+            const currentTime = new Date().getTime();
+
+            if (notificationTime > currentTime) {
+                const timeDifference = notificationTime - currentTime;
+                setTimeout(function () {
+                    showNotification();
+                }, timeDifference);
+            } else {
+                alert('Please select a future date and time for the notification.');
             }
         }
+
+        function showNotification() {
+            const notification = new Notification('Notification', {
+                body: 'This is your notification!'
+            });
+
+            // Play notification sound
+            const audio = new Audio('notification_sound.mp3');
+            audio.play();
+
+            // Show notification for 5 seconds
+            setTimeout(notification.close.bind(notification), 5000);
+        }
+
 
         function deleteTask(taskId) {
             fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}`, {
@@ -679,11 +759,13 @@
         }
 
         function backToViewList() {
+            hideAllSections();
             document.getElementById('tasksSection').style.display = 'none';
             document.getElementById('collectionsSection').style.display = 'block';
         }
 
         function showUpdateForm(taskId, taskText, priority, taskDate, taskTime) {
+            hideAllSections();
             // Populate the update form fields with the task details
             document.getElementById('updateTaskId').value = taskId;
             document.getElementById('updateTaskText').value = taskText;
