@@ -659,7 +659,10 @@ input[type="datetime-local"] {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-    animation: fadeInOut 2s ease-out;
+    animation: fadeInOut 3s ease-out;
+    max-width: 80%; /* Limit maximum width */
+    width: 80%; /* Set width */
+    text-align: center;
     display: none;
     /* Initially hidden */
 }
@@ -676,5 +679,10 @@ input[type="datetime-local"] {
     }
     100% {
         opacity: 0;
+    }
+}
+@media screen and (max-width: 600px) {
+    #popupMessage {
+        width: 90%; /* Adjust width for smaller screens */
     }
 }
