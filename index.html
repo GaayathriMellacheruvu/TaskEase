@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="logo.jpg" type="image/jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body>
@@ -33,7 +34,8 @@
             <li><a href="#" onclick="showProfile(); closeMenu()"><i class="fas fa-user"></i> Your Profile</a></li>
             <li><a href="#" onclick="showLogin(); closeMenu()"><i class="fas fa-sign-in-alt"></i> Login</a></li>
             <li><a href="#" onclick="showRegister(); closeMenu()"><i class="fas fa-user-plus"></i> Register</a></li>
-            <li><a href="#" onclick="showSpeechToText(); closeMenu()"><i class="fas fa-microphone-alt"></i> Speak Your Task</a></li>
+            <li><a href="#" onclick="showSpeechToText(); closeMenu()"><i class="fas fa-microphone-alt"></i> Speak Your
+                    Task</a></li>
             <li><a href="#" onclick="viewCollections(); closeMenu()"><i class="fas fa-tasks"></i> View Tasks</a></li>
             <li><a href="#" onclick="showChat(); closeMenu()"><i class="fas fa-comments"></i> Chat</a></li>
             <li><a href="#" onclick="logout(); closeMenu()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -99,10 +101,10 @@
                 <!-- Speech to Text Input -->
                 <div id="speechToTextSection" class="task-input" style="display: none;">
                     <label><b>Enter your task using the microphone:</b></label>
-                    <button type="button" class="primary-btn" onclick="startRecording()">Start Recording <i
+                    <button type="button" class="primary-btn" onclick="startRecording()">Start Recording &nbsp;<i
                             class="fas fa-microphone"></i></button>
-                    <button type="button" class="danger-btn" onclick="stopRecording()">Stop Recording <i
-                            class="fas fa-stop"></i></button>
+                    <button type="button" class="danger-btn" onclick="stopRecording()">Stop Recording &nbsp;<i
+                            class="fas fa-microphone-slash"></i></button>
                     <div id="spokenTaskContainer">
                         <div id="spokenTask" class="spoken-task"></div>
                     </div>
@@ -193,6 +195,9 @@
 
     <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <!-- Popup message  -->
+    <div class="popup" id="popupMessage">This is your notification!</div>
 
     <!-- JavaScript -->
     <script>
@@ -346,6 +351,27 @@
             hideAllSections();
             document.getElementById('registerForm').style.display = 'block';
         }
+
+        // Add event listeners for keydown event on username and password input fields
+        document.getElementById('loginUsername').addEventListener('keydown', function (event) {
+            // Check if the Enter key is pressed
+            if (event.key === 'Enter') {
+                // Prevent default form submission behavior
+                event.preventDefault();
+                // Call the login function
+                login();
+            }
+        });
+
+        document.getElementById('loginPassword').addEventListener('keydown', function (event) {
+            // Check if the Enter key is pressed
+            if (event.key === 'Enter') {
+                // Prevent default form submission behavior
+                event.preventDefault();
+                // Call the login function
+                login();
+            }
+        });
 
         function login() {
             var loginUsername = document.getElementById('loginUsername').value.trim();
@@ -696,29 +722,29 @@
         });
         document.getElementById('chatNotificationForm').addEventListener('submit', function (event) {
             event.preventDefault();
-
-            const notificationDateTime = document.getElementById('chatNotificationDateTime').value;
-
-            if (Notification.permission !== 'granted') {
-                Notification.requestPermission().then(function (permission) {
-                    if (permission === 'granted') {
-                        setNotification(notificationDateTime);
-                    }
-                });
-            } else {
-                setNotification(notificationDateTime);
-            }
+            const chatNotificationDateTime = document.getElementById('chatNotificationDateTime').value;
+            requestNotificationPermission().then(permission => {
+                if (permission === 'granted') {
+                    setNotification(chatNotificationDateTime);
+                }
+            });
         });
 
+        function requestNotificationPermission() {
+            if (Notification.permission !== 'granted') {
+                return Notification.requestPermission();
+            }
+            return Promise.resolve(Notification.permission);
+        }
 
         function setNotification(dateTime) {
             const notificationTime = new Date(dateTime).getTime();
             const currentTime = new Date().getTime();
-
             if (notificationTime > currentTime) {
                 const timeDifference = notificationTime - currentTime;
-                setTimeout(function () {
+                setTimeout(() => {
                     showNotification();
+                    showPopupMessageForNotif();
                 }, timeDifference);
             } else {
                 alert('Please select a future date and time for the notification.');
@@ -726,18 +752,28 @@
         }
 
         function showNotification() {
-            const notification = new Notification('Notification', {
-                body: 'This is your notification!'
-            });
-
-            // Play notification sound
+            if (!document.hasFocus()) {
+                // Show notification only when the document is not focused
+                const notification = new Notification('Notification', {
+                    body: 'This is your notification!'
+                });
+                // Close notification after 5 seconds
+                setTimeout(notification.close.bind(notification), 5000);
+            }
+            // Play notification sound only when the document is focused
             const audio = new Audio('notification_sound.mp3');
-            audio.play();
-
-            // Show notification for 5 seconds
-            setTimeout(notification.close.bind(notification), 5000);
+            if (document.hasFocus()) {
+                audio.play();
+            }
         }
 
+        function showPopupMessageForNotif() {
+            const popup = document.getElementById('popupMessage');
+            popup.style.display = 'block';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 5000); // Hide after 5 seconds
+        }
 
         function deleteTask(taskId) {
             fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}`, {
