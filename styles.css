@@ -625,23 +625,56 @@ input[type="datetime-local"] {
 
 /* Responsive styles for Start & Stop Recording */
 @media (max-width: 768px) {
+
     .primary-btn,
     .danger-btn {
-      padding: 8px 16px;
-      font-size: 14px;
+        padding: 8px 16px;
+        font-size: 14px;
     }
-  }
-  
-  @media (max-width: 576px) {
+}
+
+@media (max-width: 576px) {
+
     .primary-btn,
     .danger-btn {
-      padding: 6px 12px;
-      font-size: 12px;
+        padding: 6px 12px;
+        font-size: 12px;
     }
-  }
-  
-  /* Style the button */
+}
+
+/* Style the button */
 .button-with-icon {
-    font-family: 'Font Awesome 5 Free'; /* Use the font family */
-    font-size: 24px; /* Set font size */
-  }
+    font-family: 'Font Awesome 5 Free';
+    /* Use the font family */
+    font-size: 24px;
+    /* Set font size */
+}
+
+#popupMessage {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #b4e0f7;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeInOut 2s ease-out;
+    display: none;
+    /* Initially hidden */
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
