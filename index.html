@@ -114,7 +114,11 @@
                             <label for="notificationDateTime">Enter Date and Time:</label>
                             <input type="datetime-local" id="notificationDateTime" name="notificationDateTime">
                             <button class="notifbtn" type="submit">Set Notification</button>
+                            <div id="reminderMessage"></div>
                         </form>
+                        <div id="popupMessage" style="display: none;">
+                            NOTIFICATION <button class="primary-btn" onclick="dismissReminder()">Okay</button>
+                        </div>
                     </div>
                     <button type="button" class="secondary-btn" onclick="saveSpokenTask()">Save Task</button>
 
@@ -136,11 +140,16 @@
                     <div id="chatOutput"></div>
                     <div id="chatLoader" style="display: none;" class="loading"></div>
                     <div>
+                        <label><b>Set Notification Reminder</b></label>
                         <form id="chatNotificationForm">
                             <label for="chatNotificationDateTime">Enter Date and Time:</label>
-                            <input type="datetime-local" id="chatNotificationDateTime" name="notificationDateTime">
+                            <input type="datetime-local" id="chatNotificationDateTime" name="chatNotificationDateTime">
                             <button class="notifbtn" type="submit">Set Notification</button>
+                            <div id="reminderMessageChat"></div>
                         </form>
+                        <div id="popupMessage" style="display: none;">
+                            NOTIFICATION <button class="primary-btn" onclick="dismissReminder()">Okay</button>
+                        </div>
                     </div>
                 </div>
 
@@ -705,6 +714,10 @@
         }
 
         //Notifications function
+
+        let audioLoop;
+        let popupLoop;
+
         document.getElementById('notificationForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -746,6 +759,8 @@
                     showNotification();
                     showPopupMessageForNotif();
                 }, timeDifference);
+                document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
+                document.getElementById('reminderMessageChat').textContent = 'Your reminder is set!';
             } else {
                 alert('Please select a future date and time for the notification.');
             }
@@ -764,16 +779,30 @@
             const audio = new Audio('notification_sound.mp3');
             if (document.hasFocus()) {
                 audio.play();
+                audioLoop = setInterval(() => audio.play(), audio.duration * 1000);
             }
         }
 
         function showPopupMessageForNotif() {
             const popup = document.getElementById('popupMessage');
             popup.style.display = 'block';
-            setTimeout(() => {
+
+            popupLoop = setInterval(() => {
                 popup.style.display = 'none';
-            }, 5000); // Hide after 5 seconds
+                setTimeout(() => {
+                    popup.style.display = 'block';
+                    popup.appendChild(button);
+                }, 1000); // Adjust time interval between popup appearances as needed
+            }, 2000); // Adjust total duration of popup loop as needed
         }
+
+        function dismissReminder() {
+            const popup = document.getElementById('popupMessage');
+            popup.style.display = 'none';
+            clearInterval(popupLoop);
+            clearInterval(audioLoop);
+        }
+
 
         function deleteTask(taskId) {
             fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}`, {
