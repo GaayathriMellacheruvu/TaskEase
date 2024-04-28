@@ -773,6 +773,8 @@ function setNotification(dateTime) {
             showNotification();
             // Show notification message when setting notification
             const notificationMessage = 'Your reminder is set!'; // Set the notification message
+            document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
+            document.getElementById('reminderMessageChat').textContent = 'Your reminder is set!';
             document.getElementById('popupMessageContent').textContent = notificationMessage; // Update the content of the notification message box
             showPopupMessageForNotif(notificationMessage); // Show the popup message
         }, timeDifference);
@@ -818,6 +820,11 @@ function fetchTaskByDateTime(dateTime) {
 function dismissReminder() {
     const popup = document.getElementById('popupMessage');
     popup.style.display = 'none'; // Hide the popup
+    
+    // Stop the audio loop if it's playing
+    if (audioLoop) {
+        clearInterval(audioLoop);
+    }
 }
 
 // Function to show popup message with custom text
