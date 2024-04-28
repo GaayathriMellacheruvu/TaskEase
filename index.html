@@ -723,44 +723,36 @@ function addTask(taskText, reminderDate, reminderTime, priority = 'Medium') {
             document.getElementById('collectionsSection').style.display = 'block';
         }
 
-        //Notifications function
+//Notifications function
 
-        let audioLoop;
-        // let popupLoop;
+let audioLoop;
+let popupLoop; // Declare popupLoop variable globally
 
-        document.getElementById('notificationForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const notificationDateTime = document.getElementById('notificationDateTime').value;
-
-            if (Notification.permission !== 'granted') {
-                Notification.requestPermission().then(function (permission) {
-                    if (permission === 'granted') {
-                        setNotification(notificationDateTime);
-                    }
-                });
+// Check if the browser supports the Notification API
+if (!("Notification" in window)) {
+    console.error("This browser does not support desktop notifications.");
+} else {
+    // Check if the user has granted permission for notifications
+    if (Notification.permission !== 'granted') {
+        // If permission hasn't been granted, request it
+        Notification.requestPermission().then(function (permission) {
+            if (permission === 'granted') {
+                console.log("Notification permission granted.");
             } else {
-                setNotification(notificationDateTime);
+                console.warn("Notification permission denied.");
             }
         });
-        document.getElementById('chatNotificationForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const chatNotificationDateTime = document.getElementById('chatNotificationDateTime').value;
-            requestNotificationPermission().then(permission => {
-                if (permission === 'granted') {
-                    setNotification(chatNotificationDateTime);
-                }
-            });
-        });
+    }
+}
 
-        function requestNotificationPermission() {
-            if (Notification.permission !== 'granted') {
-                return Notification.requestPermission();
-            }
-            return Promise.resolve(Notification.permission);
-        }
-
-        let popupLoop; // Declare popupLoop variable globally
+// Check if the browser supports audio playback
+let audioSupported = true;
+try {
+    new Audio();
+} catch (e) {
+    audioSupported = false;
+    console.error("This browser does not support audio playback.");
+}
 
 // Function to set notification
 function setNotification(dateTime) {
@@ -782,6 +774,61 @@ function setNotification(dateTime) {
         alert('Please select a future date and time for the notification.');
     }
 }
+
+// Function to show popup message with custom text
+function showPopupMessageForNotif(message) {
+    const popup = document.getElementById('popupMessage');
+    popup.textContent = message; // Set the content of the popup to the custom message
+    popup.style.display = 'block';
+
+    // Clear existing popup loop
+    if (popupLoop) {
+        clearInterval(popupLoop);
+    }
+
+    // Start a new popup loop
+    popupLoop = setInterval(() => {
+        popup.style.display = 'none';
+        setTimeout(() => {
+            popup.style.display = 'block';
+        }, 1000); // Adjust time interval between popup appearances as needed
+    }, 2000); // Adjust total duration of popup loop as needed
+}
+
+// Function to show notification
+function showNotification() {
+    if (!document.hasFocus()) {
+        // Show notification only when the document is not focused and permission is granted
+        if (Notification.permission === 'granted') {
+            const notification = new Notification('Notification', {
+                body: 'This is your notification!'
+            });
+            // Close notification after 5 seconds
+            setTimeout(notification.close.bind(notification), 5000);
+        }
+    }
+    // Play notification sound only when the document is focused and audio is supported
+    if (document.hasFocus() && audioSupported) {
+        const audio = new Audio('notification_sound.mp3');
+        audio.play();
+        audioLoop = setInterval(() => {
+            audio.play();
+        }, audio.duration * 1000);
+    }
+}
+
+// Handle form submissions
+document.getElementById('notificationForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const notificationDateTime = document.getElementById('notificationDateTime').value;
+    setNotification(notificationDateTime);
+});
+
+document.getElementById('chatNotificationForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const chatNotificationDateTime = document.getElementById('chatNotificationDateTime').value;
+    setNotification(chatNotificationDateTime);
+});
 
 // Function to fetch task by date and time
 function fetchTaskByDateTime(dateTime) {
@@ -816,52 +863,15 @@ function fetchTaskByDateTime(dateTime) {
         .catch(error => console.error('Error fetching task:', error));
 }
 
+
 // Function to dismiss the reminder
 function dismissReminder() {
     const popup = document.getElementById('popupMessage');
     popup.style.display = 'none'; // Hide the popup
-    
+
     // Stop the audio loop if it's playing
     if (audioLoop) {
         clearInterval(audioLoop);
-    }
-}
-
-// Function to show popup message with custom text
-function showPopupMessageForNotif(message) {
-    const popup = document.getElementById('popupMessage');
-    popup.textContent = message; // Set the content of the popup to the custom message
-    popup.style.display = 'block';
-
-    // Clear existing popup loop
-    if (popupLoop) {
-        clearInterval(popupLoop);
-    }
-
-    // Start a new popup loop
-    popupLoop = setInterval(() => {
-        popup.style.display = 'none';
-        setTimeout(() => {
-            popup.style.display = 'block';
-        }, 1000); // Adjust time interval between popup appearances as needed
-    }, 2000); // Adjust total duration of popup loop as needed
-}
-
-// Function to show notification
-function showNotification() {
-    if (!document.hasFocus()) {
-        // Show notification only when the document is not focused
-        const notification = new Notification('Notification', {
-            body: 'This is your notification!'
-        });
-        // Close notification after 5 seconds
-        setTimeout(notification.close.bind(notification), 5000);
-    }
-    // Play notification sound only when the document is focused
-    const audio = new Audio('notification_sound.mp3');
-    if (document.hasFocus()) {
-        audio.play();
-        audioLoop = setInterval(() => audio.play(), audio.duration * 1000);
     }
 }
 
