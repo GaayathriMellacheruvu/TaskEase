@@ -777,6 +777,7 @@ function setNotification(dateTime) {
             document.getElementById('popupMessageContent').textContent = notificationMessage; // Update the content of the notification message box
             showPopupMessageForNotif(notificationMessage); // Show the popup message
         }, timeDifference);
+        document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
     } else {
         alert('Please select a future date and time for the notification.');
     }
