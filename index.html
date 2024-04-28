@@ -818,6 +818,7 @@ function setNotification(dateTime) {
     const currentTime = new Date().getTime();
     if (notificationTime > currentTime) {
         const timeDifference = notificationTime - currentTime;
+        document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
         setTimeout(() => {
             fetchTaskByDateTime(dateTime);
             showNotification();
