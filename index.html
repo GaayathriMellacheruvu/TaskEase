@@ -722,8 +722,7 @@ function addTask(taskText, reminderDate, reminderTime, priority = 'Medium') {
 
             document.getElementById('collectionsSection').style.display = 'block';
         }
-
-//Notifications function
+// Notifications function
 
 let audioLoop;
 let popupLoop; // Declare popupLoop variable globally
@@ -743,15 +742,6 @@ if (!("Notification" in window)) {
             }
         });
     }
-}
-
-// Check if the browser supports audio playback
-let audioSupported = true;
-try {
-    new Audio();
-} catch (e) {
-    audioSupported = false;
-    console.error("This browser does not support audio playback.");
 }
 
 // Function to set notification
@@ -807,14 +797,6 @@ function showNotification() {
             setTimeout(notification.close.bind(notification), 5000);
         }
     }
-    // Play notification sound only when the document is focused and audio is supported
-    if (document.hasFocus() && audioSupported) {
-        const audio = new Audio('notification_sound.mp3');
-        audio.play();
-        audioLoop = setInterval(() => {
-            audio.play();
-        }, audio.duration * 1000);
-    }
 }
 
 // Handle form submissions
@@ -856,6 +838,9 @@ function fetchTaskByDateTime(dateTime) {
                     dismissReminder(); // Dismiss the reminder
                 });
                 document.getElementById('popupMessage').appendChild(okayButton);
+
+                // Play notification sound
+                playNotificationSound();
             } else {
                 console.log('No task found for the reminder.');
             }
@@ -863,15 +848,27 @@ function fetchTaskByDateTime(dateTime) {
         .catch(error => console.error('Error fetching task:', error));
 }
 
-
 // Function to dismiss the reminder
 function dismissReminder() {
     const popup = document.getElementById('popupMessage');
     popup.style.display = 'none'; // Hide the popup
+}
 
-    // Stop the audio loop if it's playing
-    if (audioLoop) {
-        clearInterval(audioLoop);
+// Function to play notification sound
+function playNotificationSound() {
+    // Check if the browser supports audio playback
+    let audioSupported = true;
+    try {
+        new Audio();
+    } catch (e) {
+        audioSupported = false;
+        console.error("This browser does not support audio playback.");
+    }
+
+    // Play notification sound only when audio is supported
+    if (audioSupported) {
+        const audio = new Audio('notification_sound.mp3');
+        audio.play();
     }
 }
 
