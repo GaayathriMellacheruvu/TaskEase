@@ -98,35 +98,38 @@
                 <div id="manualTextSection" class="task-input" style="display: none;">
                 </div>
 
-                <!-- Speech to Text Input -->
-                <div id="speechToTextSection" class="task-input" style="display: none;">
-                    <label><b>Enter your task using the microphone:</b></label>
-                    <button type="button" class="primary-btn" onclick="startRecording()">Start Recording &nbsp;<i
-                            class="fas fa-microphone"></i></button>
-                    <button type="button" class="danger-btn" onclick="stopRecording()">Stop Recording &nbsp;<i
-                            class="fas fa-microphone-slash"></i></button>
-                    <div id="spokenTaskContainer">
-                        <div id="spokenTask" class="spoken-task"></div>
-                    </div>
-                    <div>
-                        <label><b>Set Notification Reminder</b></label>
-                        <form id="notificationForm">
-                            <label for="notificationDateTime">Enter Date and Time:</label>
-                            <input type="datetime-local" id="notificationDateTime" name="notificationDateTime">
-                            <button class="notifbtn" type="submit">Set Notification</button>
-                            <div id="reminderMessage"></div>
-                        </form>
-                        <div id="popupMessage" style="display: none;">
-                            NOTIFICATION <button class="primary-btn" onclick="dismissReminder()">Okay</button>
-                        </div>
-                    </div>
-                    <button type="button" class="secondary-btn" onclick="saveSpokenTask()">Save Task</button>
+<!-- Speech to Text Input -->
+<div id="speechToTextSection" class="task-input" style="display: none;">
+  <label><b>Enter your task using the microphone:</b></label>
+  <button type="button" class="primary-btn" onclick="startRecording()">Start Recording &nbsp;<i class="fas fa-microphone"></i></button>
+  <button type="button" class="danger-btn" onclick="stopRecording()">Stop Recording &nbsp;<i class="fas fa-microphone-slash"></i></button>
+  <div id="spokenTaskContainer">
+      <div id="spokenTask" class="spoken-task"></div>
+  </div>
+  <div>
+      <label><b>Set Notification Reminder</b></label>
+      <form id="notificationForm">
+          <label for="notificationDateTime">Enter Date and Time:</label>
+          <input type="datetime-local" id="notificationDateTime" name="notificationDateTime" required> <!-- Add required attribute -->
+          <button class="notifbtn" type="submit">Set Notification</button>
+          <div id="reminderMessage"></div>
+      </form>
+      <div id="popupMessage" style="display: none;">
+          <p id="popupMessageContent"></p> <!-- Display notification message here -->
+          <button class="primary-btn" onclick="dismissReminder()">Okay</button>
+      </div>
+  </div>
+  <button type="button" class="secondary-btn" onclick="saveSpokenTask()">Save Task</button>
+  <div id="spokenTextLoader" style="display: none;" class="loading"></div>
+  <div id="spokenTaskSavedMessage" style="display: none;">Task saved successfully!</div>
+</div>
 
-                    <div id="spokenTextLoader" style="display: none;" class="loading"></div>
-                    <!-- Inside your HTML markup -->
-                    <div id="spokenTaskSavedMessage" style="display: none;">Task saved successfully!</div>
-
-                </div>
+<!-- Notification Box -->
+<div id="notificationBox" class="notification-box" style="display: none;">
+  <h3>Notification</h3>
+  <p id="popupMessage"></p> <!-- Display notification message here -->
+  <button onclick="dismissReminder()">Okay</button> <!-- Add Okay button -->
+</div>
 
                 <!-- Chat Section -->
                 <div class="task-input" id="chatSection" style="display: none;">
@@ -544,81 +547,88 @@
         }
 
         function saveSpokenTask() {
-            stopRecording();
+    stopRecording();
 
-            var spokenTask = spokenTaskDiv.innerText.trim();
-            if (username && spokenTask !== '') {
-                // Inside the saveSpokenTask() function after successfully saving the spoken task
-                document.getElementById('spokenTextLoader').style.display = 'block';
-                //document.getElementById('spokenTaskSavedMessage').style.display = 'block';
+    var spokenTask = spokenTaskDiv.innerText.trim();
+    var notificationDateTime = document.getElementById('notificationDateTime').value.trim(); // Get the value of the notification date and time input
 
-                addTask(spokenTask, 'spokenTextLoader'); // Here is the call to addTask
-                // Display spoken task in a box
-                document.getElementById('spokenTask').innerText = spokenTask;
-                document.getElementById('spokenTaskContainer').style.display = 'block';
-                // Display a message to the user that the task is saved
-                document.getElementById('output').innerText = 'Task saved successfully';
+    if (username && spokenTask !== '' && notificationDateTime !== '') { // Check if the spoken task and notification date/time are not empty
+        // Inside the saveSpokenTask() function after successfully saving the spoken task
+        document.getElementById('spokenTextLoader').style.display = 'block';
 
-                // Check if the taskSavedMessage element exists before attempting to modify its style
-                var taskSavedMessage = document.getElementById('taskSavedMessage');
-                if (taskSavedMessage) {
-                    taskSavedMessage.style.display = 'block';
-                }
-            }
+        var notificationDate = new Date(notificationDateTime).toISOString().split('T')[0];
+        var notificationTime = new Date(notificationDateTime).toTimeString().split(' ')[0];
+
+        addTask(spokenTask, notificationDate, notificationTime, 'Medium'); // Pass the notification date and time to addTask
+        
+        // Display spoken task in a box if the element exists
+        var spokenTaskElement = document.getElementById('spokenTask');
+        if (spokenTaskElement) {
+            spokenTaskElement.innerText = spokenTask;
         }
-
-        function addTask(taskText, loaderId) {
-            // Get current date and time
-            const currentDate = new Date().toISOString().split('T')[0];
-            const currentTime = new Date().toTimeString().split(' ')[0];
-            const priority = 'Medium'; // Set priority to Medium
-
-            // Extract date and time from task text using regex
-            const dateRegex = /(\d{4}-\d{2}-\d{2})/;
-            const timeRegex = /(\d{2}:\d{2}:\d{2})/;
-            const extractedDate = taskText.match(dateRegex);
-            const extractedTime = taskText.match(timeRegex);
-
-            // If date and time are provided in taskText, use them, otherwise use current date and time
-            const taskDate = extractedDate ? extractedDate[0] : currentDate;
-            const taskTime = extractedTime ? extractedTime[0] : currentTime;
-
-            // Prepare task data
-            const taskData = {
-                task_text: taskText,
-                priority: priority,
-                date: currentDate,
-                time: currentTime,
-                created_at: new Date().toISOString()
-            };
-
-            // Make a POST request to the API to add the task
-            fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(taskData)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to add task');
-                    }
-                })
-                .then(data => {
-                    console.log('Task added successfully:', data.message);
-                    // Hide the loading indicator
-                    document.getElementById(loaderId).style.display = 'none';
-                    // Show a success message or perform any other actions
-                    document.getElementById('spokenTaskSavedMessage').style.display = 'block';
-                })
-                .catch(error => {
-                    console.error('Error adding task:', error);
-                    // Show an error message or perform error handling
-                });
+        
+        // Display the spoken task container if the element exists
+        var spokenTaskContainer = document.getElementById('spokenTaskContainer');
+        if (spokenTaskContainer) {
+            spokenTaskContainer.style.display = 'block';
         }
+        
+        // Display a message to the user that the task is saved
+        document.getElementById('spokenTaskSavedMessage').innerText = 'Task saved successfully';
+
+        // Check if the taskSavedMessage element exists before attempting to modify its style
+        var taskSavedMessage = document.getElementById('taskSavedMessage');
+        if (taskSavedMessage) {
+            taskSavedMessage.style.display = 'block';
+        }
+    } else {
+        alert('Please provide both spoken task and notification date/time.');
+    }
+}
+
+function addTask(taskText, reminderDate, reminderTime, priority = 'Medium') {
+    // Prepare task data
+    var taskData = {
+        task_text: taskText,
+        priority: priority,
+        date: null, // Will be filled by the backend based on task text
+        time: null, // Will be filled by the backend based on task text
+        reminder_date: reminderDate,
+        reminder_time: reminderTime,
+        created_at: new Date().toISOString()
+    };
+
+    // Make a POST request to the API to add the task
+    fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('Failed to add task');
+        }
+    })
+    .then(data => {
+        console.log('Task added successfully:', data.message);
+        // Hide the loading animation
+        document.getElementById('spokenTextLoader').style.display = 'none';
+        // Show a success message or perform any other actions
+        document.getElementById('spokenTaskSavedMessage').innerText = 'Task saved successfully';
+        // Display the task saved message
+        document.getElementById('spokenTaskSavedMessage').style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Error adding task:', error);
+        // Hide the loading animation on error as well
+        document.getElementById('spokenTextLoader').style.display = 'none';
+        // Show an error message or perform error handling
+    });
+}
 
         function get_collection_name() {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -716,7 +726,7 @@
         //Notifications function
 
         let audioLoop;
-        let popupLoop;
+        // let popupLoop;
 
         document.getElementById('notificationForm').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -750,59 +760,103 @@
             return Promise.resolve(Notification.permission);
         }
 
-        function setNotification(dateTime) {
-            const notificationTime = new Date(dateTime).getTime();
-            const currentTime = new Date().getTime();
-            if (notificationTime > currentTime) {
-                const timeDifference = notificationTime - currentTime;
-                setTimeout(() => {
-                    showNotification();
-                    showPopupMessageForNotif();
-                }, timeDifference);
-                document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
-                document.getElementById('reminderMessageChat').textContent = 'Your reminder is set!';
-            } else {
-                alert('Please select a future date and time for the notification.');
-            }
-        }
+        let popupLoop; // Declare popupLoop variable globally
 
-        function showNotification() {
-            if (!document.hasFocus()) {
-                // Show notification only when the document is not focused
-                const notification = new Notification('Notification', {
-                    body: 'This is your notification!'
+// Function to set notification
+function setNotification(dateTime) {
+    const notificationTime = new Date(dateTime).getTime();
+    const currentTime = new Date().getTime();
+    if (notificationTime > currentTime) {
+        const timeDifference = notificationTime - currentTime;
+        setTimeout(() => {
+            fetchTaskByDateTime(dateTime);
+            showNotification();
+            // Show notification message when setting notification
+            const notificationMessage = 'Your reminder is set!'; // Set the notification message
+            document.getElementById('popupMessageContent').textContent = notificationMessage; // Update the content of the notification message box
+            showPopupMessageForNotif(notificationMessage); // Show the popup message
+        }, timeDifference);
+    } else {
+        alert('Please select a future date and time for the notification.');
+    }
+}
+
+// Function to fetch task by date and time
+function fetchTaskByDateTime(dateTime) {
+    const reminderDate = new Date(dateTime).toISOString().split('T')[0];
+    const reminderTime = new Date(dateTime).toTimeString().split(' ')[0];
+
+    fetch(`https://task-ease-537o.onrender.com/tasks/tasks/reminder/?username=${username}&collection_name=april&reminder_date=${reminderDate}&reminder_time=${reminderTime}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('API Response:', data); // Log the response data to inspect its structure
+            if (data.tasks && data.tasks.length > 0) {
+                const taskText = data.tasks[0]; // Fetch task text
+                const notificationMessage = `This is your notification! \n\n Task: ${taskText}`; // Combine notification message and task text
+                showPopupMessageForNotif(notificationMessage); // Pass the combined message to the popup function
+                // Show the "Okay" button on the notification
+                const okayButton = document.createElement('button');
+                okayButton.textContent = 'Okay';
+                okayButton.addEventListener('click', function() {
+                    clearInterval(popupLoop); // Stop the popup loop interval
+                    dismissReminder(); // Dismiss the reminder
                 });
-                // Close notification after 5 seconds
-                setTimeout(notification.close.bind(notification), 5000);
+                document.getElementById('popupMessage').appendChild(okayButton);
+            } else {
+                console.log('No task found for the reminder.');
             }
-            // Play notification sound only when the document is focused
-            const audio = new Audio('notification_sound.mp3');
-            if (document.hasFocus()) {
-                audio.play();
-                audioLoop = setInterval(() => audio.play(), audio.duration * 1000);
-            }
-        }
+        })
+        .catch(error => console.error('Error fetching task:', error));
+}
 
-        function showPopupMessageForNotif() {
-            const popup = document.getElementById('popupMessage');
+// Function to dismiss the reminder
+function dismissReminder() {
+    const popup = document.getElementById('popupMessage');
+    popup.style.display = 'none'; // Hide the popup
+}
+
+// Function to show popup message with custom text
+function showPopupMessageForNotif(message) {
+    const popup = document.getElementById('popupMessage');
+    popup.textContent = message; // Set the content of the popup to the custom message
+    popup.style.display = 'block';
+
+    // Clear existing popup loop
+    if (popupLoop) {
+        clearInterval(popupLoop);
+    }
+
+    // Start a new popup loop
+    popupLoop = setInterval(() => {
+        popup.style.display = 'none';
+        setTimeout(() => {
             popup.style.display = 'block';
+        }, 1000); // Adjust time interval between popup appearances as needed
+    }, 2000); // Adjust total duration of popup loop as needed
+}
 
-            popupLoop = setInterval(() => {
-                popup.style.display = 'none';
-                setTimeout(() => {
-                    popup.style.display = 'block';
-                    popup.appendChild(button);
-                }, 1000); // Adjust time interval between popup appearances as needed
-            }, 2000); // Adjust total duration of popup loop as needed
-        }
-
-        function dismissReminder() {
-            const popup = document.getElementById('popupMessage');
-            popup.style.display = 'none';
-            clearInterval(popupLoop);
-            clearInterval(audioLoop);
-        }
-
+// Function to show notification
+function showNotification() {
+    if (!document.hasFocus()) {
+        // Show notification only when the document is not focused
+        const notification = new Notification('Notification', {
+            body: 'This is your notification!'
+        });
+        // Close notification after 5 seconds
+        setTimeout(notification.close.bind(notification), 5000);
+    }
+    // Play notification sound only when the document is focused
+    const audio = new Audio('notification_sound.mp3');
+    if (document.hasFocus()) {
+        audio.play();
+        audioLoop = setInterval(() => audio.play(), audio.duration * 1000);
+    }
+}
 
         function deleteTask(taskId) {
             fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}`, {
