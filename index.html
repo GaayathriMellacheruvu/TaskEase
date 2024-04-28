@@ -119,6 +119,15 @@
           <button class="primary-btn" onclick="dismissReminder()">Okay</button>
       </div>
   </div>
+  <!-- Add Priority Selection Dropdown -->
+  <div>
+      <label for="prioritySelect"><b>Select Priority:</b></label>
+      <select id="prioritySelect">
+          <option value="High">High</option>
+          <option value="Medium" selected>Medium</option>
+          <option value="Low">Low</option>
+      </select>
+  </div>
   <button type="button" class="secondary-btn" onclick="saveSpokenTask()">Save Task</button>
   <div id="spokenTextLoader" style="display: none;" class="loading"></div>
   <div id="spokenTaskSavedMessage" style="display: none;">Task saved successfully!</div>
@@ -204,6 +213,12 @@
                 <div id="tasksSection" class="tasks-section" style="display: none;">
                     <h2>Your Tasks</h2>
                     <button onclick="backToViewList()"><b><u>Back to View List</u></b></button>
+                            <!-- Add sort select dropdown -->
+                            <select onchange="sortTasks(this.value)">
+                              <option value="default">Sort by Priority</option>
+                              <option value="HighToLow">High to Low</option>
+                              <option value="LowToHigh">Low to High</option>
+                              </select>
                     <div id="tasks" class="tasks"></div>
                 </div>
             </div>
@@ -257,82 +272,119 @@
         })
         .catch(error => console.error('Error fetching tasks:', error));
 }
+       
+function sortTasks(sortBy) {
+            const tasksDiv = document.getElementById('tasks');
+            const tasks = Array.from(tasksDiv.children);
 
-function displayTasks(tasks) {
-    const tasksDiv = document.getElementById('tasks');
-    tasksDiv.innerHTML = '';
+            tasks.sort((a, b) => {
+                const priorityA = a.querySelector('.priority').innerText;
+                const priorityB = b.querySelector('.priority').innerText;
 
-    tasks.forEach(task => {
-        const taskItem = document.createElement('div');
-        taskItem.classList.add('task-item');
+                if (sortBy === 'HighToLow') {
+                    return getPriorityValue(priorityB) - getPriorityValue(priorityA); // Sort high to low
+                } else if (sortBy === 'LowToHigh') {
+                    return getPriorityValue(priorityA) - getPriorityValue(priorityB); // Sort low to high
+                }
+            });
 
-        const taskContent = document.createElement('div');
-        taskContent.classList.add('task-content');
-        taskContent.innerHTML = `
-            <label class="task-text ${task.completed ? 'completed' : ''}">${task.task_text}</label>
-            <input type="checkbox" id="taskCheckbox_${task.task_id}" name="taskCheckbox" data-task-id="${task.task_id}" ${task.completed || localStorage.getItem(`task_${task.task_id}_checked`) === 'true' ? 'checked' : ''}>
-        `;
+            tasks.forEach(task => tasksDiv.appendChild(task));
+        }
 
-        const detailsDiv = document.createElement('div');
-        detailsDiv.classList.add('task-details');
-        detailsDiv.innerHTML = `
-            <p><strong>Priority:</strong> ${task.priority}</p>
-            <p><strong>Date:</strong> ${task.date}</p>
-            <p><strong>Time:</strong> ${task.time}</p>
-            <p><strong>Reminder Date:</strong> ${task.reminder_date}</p>
-            <p><strong>Reminder Time:</strong> ${task.reminder_time}</p>
-        `;
-        detailsDiv.style.display = 'none';
+        function displayTasks(tasks) {
+            const tasksDiv = document.getElementById('tasks');
+            tasksDiv.innerHTML = '';
 
-        const checkbox = taskContent.querySelector('input[type="checkbox"]');
-        checkbox.addEventListener('change', function () {
-            const taskId = this.dataset.taskId;
-            const completed = this.checked;
-            localStorage.setItem(`task_${taskId}_checked`, completed);
-            if (completed) {
-                taskContent.querySelector('.task-text').classList.add('completed');
-            } else {
-                taskContent.querySelector('.task-text').classList.remove('completed');
+            tasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.classList.add('task-item');
+
+                const taskContent = document.createElement('div');
+                taskContent.classList.add('task-content');
+                taskContent.innerHTML = `
+                    <label class="task-text ${task.completed ? 'completed' : ''}">${task.task_text}</label>
+                    <input type="checkbox" id="taskCheckbox_${task.task_id}" name="taskCheckbox" data-task-id="${task.task_id}" ${task.completed || localStorage.getItem(`task_${task.task_id}_checked`) === 'true' ? 'checked' : ''}>
+                `;
+
+                const detailsDiv = document.createElement('div');
+                detailsDiv.classList.add('task-details');
+                detailsDiv.innerHTML = `
+                    <p><strong>Priority:</strong> ${task.priority}</p>
+                    <p><strong>Date:</strong> ${task.date}</p>
+                    <p><strong>Time:</strong> ${task.time}</p>
+                    <p><strong>Reminder Date:</strong> ${task.reminder_date}</p>
+                    <p><strong>Reminder Time:</strong> ${task.reminder_time}</p>
+                `;
+                detailsDiv.style.display = 'none';
+
+                const priorityDiv = document.createElement('div');
+                priorityDiv.classList.add('priority');
+                priorityDiv.textContent = task.priority;
+
+                const checkbox = taskContent.querySelector('input[type="checkbox"]');
+                checkbox.addEventListener('change', function () {
+                    const taskId = this.dataset.taskId;
+                    const completed = this.checked;
+                    localStorage.setItem(`task_${taskId}_checked`, completed);
+                    if (completed) {
+                        taskContent.querySelector('.task-text').classList.add('completed');
+                    } else {
+                        taskContent.querySelector('.task-text').classList.remove('completed');
+                    }
+                });
+
+                taskItem.appendChild(taskContent);
+                taskItem.appendChild(detailsDiv);
+                taskItem.appendChild(priorityDiv); // Append the priority div
+
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.classList.add('task-buttons');
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    deleteTask(task.task_id);
+                });
+                buttonsDiv.appendChild(deleteButton);
+
+                const updateButton = document.createElement('button');
+                updateButton.textContent = 'Update';
+                updateButton.classList.add('secondary-btn');
+                updateButton.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    showUpdateForm(task.task_id, task.task_text, task.priority, task.date, task.time, task.reminder_date, task.reminder_time);
+                });
+                buttonsDiv.appendChild(updateButton);
+
+                taskItem.appendChild(buttonsDiv);
+
+                taskItem.addEventListener('click', function (event) {
+                    if (event.target.type !== 'checkbox') {
+                        const details = taskItem.querySelector('.task-details');
+                        details.style.display = details.style.display === 'none' ? 'block' : 'none';
+                    }
+                });
+
+                tasksDiv.appendChild(taskItem);
+            });
+
+            document.getElementById('tasksSection').style.display = 'block';
+        }
+
+        // Helper function to get priority value
+        function getPriorityValue(priority) {
+            switch(priority.toLowerCase()) {
+                case 'high':
+                    return 3;
+                case 'medium':
+                    return 2;
+                case 'low':
+                    return 1;
+                default:
+                    return 0;
             }
-        });
-
-        taskItem.appendChild(taskContent);
-        taskItem.appendChild(detailsDiv);
-
-        const buttonsDiv = document.createElement('div');
-        buttonsDiv.classList.add('task-buttons');
-
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.addEventListener('click', function (event) {
-            event.stopPropagation();
-            deleteTask(task.task_id);
-        });
-        buttonsDiv.appendChild(deleteButton);
-
-        const updateButton = document.createElement('button');
-        updateButton.textContent = 'Update';
-        updateButton.classList.add('secondary-btn');
-        updateButton.addEventListener('click', function (event) {
-            event.stopPropagation();
-            showUpdateForm(task.task_id, task.task_text, task.priority, task.date, task.time, task.reminder_date, task.reminder_time);
-        });
-        buttonsDiv.appendChild(updateButton);
-
-        taskItem.appendChild(buttonsDiv);
-
-        taskItem.addEventListener('click', function (event) {
-            if (event.target.type !== 'checkbox') {
-                const details = taskItem.querySelector('.task-details');
-                details.style.display = details.style.display === 'none' ? 'block' : 'none';
-            }
-        });
-
-        tasksDiv.appendChild(taskItem);
-    });
-
-    document.getElementById('tasksSection').style.display = 'block';
-}
+        }
 
 function updateTaskCompletion(taskId, completed) {
     fetch('mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/', {
@@ -558,6 +610,7 @@ function showLogin() {
 
     var spokenTask = spokenTaskDiv.innerText.trim();
     var notificationDateTime = document.getElementById('notificationDateTime').value.trim(); // Get the value of the notification date and time input
+    var priority = document.getElementById('prioritySelect').value; // Get the selected priority from the dropdown
 
     if (username && spokenTask !== '' && notificationDateTime !== '') { // Check if the spoken task and notification date/time are not empty
         // Inside the saveSpokenTask() function after successfully saving the spoken task
@@ -566,7 +619,7 @@ function showLogin() {
         var notificationDate = new Date(notificationDateTime).toISOString().split('T')[0];
         var notificationTime = new Date(notificationDateTime).toTimeString().split(' ')[0];
 
-        addTask(spokenTask, notificationDate, notificationTime, 'Medium'); // Pass the notification date and time to addTask
+        addTask(spokenTask, notificationDate, notificationTime, priority); // Pass the selected priority to addTask
         
         // Display spoken task in a box if the element exists
         var spokenTaskElement = document.getElementById('spokenTask');
@@ -593,13 +646,11 @@ function showLogin() {
     }
 }
 
-function addTask(taskText, reminderDate, reminderTime, priority = 'Medium') {
+function addTask(taskText, reminderDate, reminderTime, priority) {
     // Prepare task data
     var taskData = {
         task_text: taskText,
         priority: priority,
-        date: null, // Will be filled by the backend based on task text
-        time: null, // Will be filled by the backend based on task text
         reminder_date: reminderDate,
         reminder_time: reminderTime,
         created_at: new Date().toISOString()
@@ -777,7 +828,6 @@ function setNotification(dateTime) {
             document.getElementById('popupMessageContent').textContent = notificationMessage; // Update the content of the notification message box
             showPopupMessageForNotif(notificationMessage); // Show the popup message
         }, timeDifference);
-        document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
     } else {
         alert('Please select a future date and time for the notification.');
     }
