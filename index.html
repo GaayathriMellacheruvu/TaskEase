@@ -156,40 +156,48 @@
                     </div>
                 </div>
 
-                <!-- Update Task Form -->
-                <div id="updateTaskForm" class="task-input" style="display: none;">
-                    <button class="updateBackButton" onclick="viewCollections()"
-                        style='font-size:40px;'>&#8592;</button>
-                    <h2>Update Task</h2>
-                    <form id="updateTaskForm">
-                        <!-- Disable the input field for task_id -->
-                        <div class="form-group">
-                            <label for="updateTaskId"></label>
-                            <input type="text" id="updateTaskId" class="form-control" readonly disabled>
-                        </div>
-                        <div class="form-group">
-                            <label for="updateTaskText">Task Text:</label>
-                            <input type="text" id="updateTaskText" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="updatePriority">Priority:</label>
-                            <select id="updatePriority" class="form-select">
-                                <option value="Low">Low</option>
-                                <option value="Medium">Medium</option>
-                                <option value="High">High</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="updateTaskDate">Date:</label>
-                            <input type="date" id="updateTaskDate" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="updateTaskTime">Time:</label>
-                            <input type="time" id="updateTaskTime" class="form-control" required>
-                        </div>
-                        <button type="button" class="secondary-btn" onclick="updateTask()">Update Task</button>
-                    </form>
-                </div>
+<!-- Update Task Form -->
+<div id="updateTaskForm" class="task-input" style="display: none;">
+  <button class="updateBackButton" onclick="viewCollections()" style='font-size:40px;'>&#8592;</button>
+  <h2>Update Task</h2>
+  <form id="updateTaskFormData">
+      <!-- Disable the input field for task_id -->
+      <div class="form-group">
+          <label for="updateTaskId">Task ID:</label>
+          <input type="text" id="updateTaskId" class="form-control" readonly disabled>
+      </div>
+      <div class="form-group">
+          <label for="updateTaskText">Task Text:</label>
+          <input type="text" id="updateTaskText" class="form-control" required>
+      </div>
+      <div class="form-group">
+          <label for="updatePriority">Priority:</label>
+          <select id="updatePriority" class="form-select">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label for="updateTaskDate">Date:</label>
+          <input type="date" id="updateTaskDate" class="form-control" required>
+      </div>
+      <div class="form-group">
+          <label for="updateTaskTime">Time:</label>
+          <input type="time" id="updateTaskTime" class="form-control" required>
+      </div>
+      <!-- New input fields for reminder date and time -->
+      <div class="form-group">
+          <label for="updateReminderDate">Reminder Date:</label>
+          <input type="date" id="updateReminderDate" class="form-control">
+      </div>
+      <div class="form-group">
+          <label for="updateReminderTime">Reminder Time:</label>
+          <input type="time" id="updateReminderTime" class="form-control">
+      </div>
+      <button type="button" class="secondary-btn" onclick="updateTask()">Update Task</button>
+  </form>
+</div>
 
 
                 <!-- View Tasks Section -->
@@ -240,124 +248,123 @@
         }
 
         function fetchTasks(collectionName) {
-            fetch(`https://task-ease-537o.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}`, {
-                method: 'GET'
-            })
-                .then(response => response.json())
-                .then(data => {
-                    displayTasks(data.tasks);
-                })
-                .catch(error => console.error('Error fetching tasks:', error));
-        }
+    fetch(`https://task-ease-537o.onrender.com/tasks/list_tasks/?username=${username}&collection_name=${collectionName}`, {
+        method: 'GET'
+    })
+        .then(response => response.json())
+        .then(data => {
+            displayTasks(data.tasks);
+        })
+        .catch(error => console.error('Error fetching tasks:', error));
+}
 
-        function displayTasks(tasks) {
-            const tasksDiv = document.getElementById('tasks');
-            tasksDiv.innerHTML = '';
+function displayTasks(tasks) {
+    const tasksDiv = document.getElementById('tasks');
+    tasksDiv.innerHTML = '';
 
-            tasks.forEach(task => {
-                const taskItem = document.createElement('div');
-                taskItem.classList.add('task-item');
+    tasks.forEach(task => {
+        const taskItem = document.createElement('div');
+        taskItem.classList.add('task-item');
 
-                const taskContent = document.createElement('div');
-                taskContent.classList.add('task-content');
-                taskContent.innerHTML = `
+        const taskContent = document.createElement('div');
+        taskContent.classList.add('task-content');
+        taskContent.innerHTML = `
             <label class="task-text ${task.completed ? 'completed' : ''}">${task.task_text}</label>
             <input type="checkbox" id="taskCheckbox_${task.task_id}" name="taskCheckbox" data-task-id="${task.task_id}" ${task.completed || localStorage.getItem(`task_${task.task_id}_checked`) === 'true' ? 'checked' : ''}>
         `;
 
-                const detailsDiv = document.createElement('div');
-                detailsDiv.classList.add('task-details');
-                detailsDiv.innerHTML = `
+        const detailsDiv = document.createElement('div');
+        detailsDiv.classList.add('task-details');
+        detailsDiv.innerHTML = `
             <p><strong>Priority:</strong> ${task.priority}</p>
             <p><strong>Date:</strong> ${task.date}</p>
             <p><strong>Time:</strong> ${task.time}</p>
+            <p><strong>Reminder Date:</strong> ${task.reminder_date}</p>
+            <p><strong>Reminder Time:</strong> ${task.reminder_time}</p>
         `;
-                detailsDiv.style.display = 'none';
+        detailsDiv.style.display = 'none';
 
-                const checkbox = taskContent.querySelector('input[type="checkbox"]');
-                checkbox.addEventListener('change', function () {
-                    const taskId = this.dataset.taskId;
-                    const completed = this.checked;
-                    localStorage.setItem(`task_${taskId}_checked`, completed);
-                    if (completed) {
-                        taskContent.querySelector('.task-text').classList.add('completed');
-                    } else {
-                        taskContent.querySelector('.task-text').classList.remove('completed');
-                    }
-                });
+        const checkbox = taskContent.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function () {
+            const taskId = this.dataset.taskId;
+            const completed = this.checked;
+            localStorage.setItem(`task_${taskId}_checked`, completed);
+            if (completed) {
+                taskContent.querySelector('.task-text').classList.add('completed');
+            } else {
+                taskContent.querySelector('.task-text').classList.remove('completed');
+            }
+        });
 
-                taskItem.appendChild(taskContent);
-                taskItem.appendChild(detailsDiv);
+        taskItem.appendChild(taskContent);
+        taskItem.appendChild(detailsDiv);
 
-                const buttonsDiv = document.createElement('div');
-                buttonsDiv.classList.add('task-buttons');
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.classList.add('task-buttons');
 
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', function (event) {
-                    event.stopPropagation();
-                    deleteTask(task.task_id);
-                });
-                buttonsDiv.appendChild(deleteButton);
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', function (event) {
+            event.stopPropagation();
+            deleteTask(task.task_id);
+        });
+        buttonsDiv.appendChild(deleteButton);
 
-                const updateButton = document.createElement('button');
-                updateButton.textContent = 'Update';
-                updateButton.classList.add('secondary-btn');
-                updateButton.addEventListener('click', function (event) {
-                    event.stopPropagation();
-                    showUpdateForm(task.task_id, task.task_text, task.priority, task.date, task.time);
-                });
-                buttonsDiv.appendChild(updateButton);
+        const updateButton = document.createElement('button');
+        updateButton.textContent = 'Update';
+        updateButton.classList.add('secondary-btn');
+        updateButton.addEventListener('click', function (event) {
+            event.stopPropagation();
+            showUpdateForm(task.task_id, task.task_text, task.priority, task.date, task.time, task.reminder_date, task.reminder_time);
+        });
+        buttonsDiv.appendChild(updateButton);
 
-                taskItem.appendChild(buttonsDiv);
+        taskItem.appendChild(buttonsDiv);
 
-                taskItem.addEventListener('click', function (event) {
-                    if (event.target.type !== 'checkbox') {
-                        const details = taskItem.querySelector('.task-details');
-                        details.style.display = details.style.display === 'none' ? 'block' : 'none';
-                    }
-                });
+        taskItem.addEventListener('click', function (event) {
+            if (event.target.type !== 'checkbox') {
+                const details = taskItem.querySelector('.task-details');
+                details.style.display = details.style.display === 'none' ? 'block' : 'none';
+            }
+        });
 
-                tasksDiv.appendChild(taskItem);
-            });
+        tasksDiv.appendChild(taskItem);
+    });
 
-            document.getElementById('tasksSection').style.display = 'block';
-        }
+    document.getElementById('tasksSection').style.display = 'block';
+}
 
+function updateTaskCompletion(taskId, completed) {
+    fetch('mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ taskId, completed })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update task completion');
+            }
+        })
+        .catch(error => console.error('Error updating task completion:', error));
+}
 
-        function updateTaskCompletion(taskId, completed) {
-            fetch('mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ taskId, completed })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to update task completion');
-                    }
-                })
-                .catch(error => console.error('Error updating task completion:', error));
-        }
+window.onload = function () {
+    showLogin();
+};
 
+// Inside the showLogin() function
+function showLogin() {
+    hideAllSections();
+    document.getElementById('loginForm').style.display = 'block';
 
-
-        window.onload = function () {
-            showLogin();
-        };
-
-        // Inside the showLogin() function
-        function showLogin() {
-            hideAllSections();
-            document.getElementById('loginForm').style.display = 'block';
-
-            // Add event listener to the "Forgot Password" link
-            document.getElementById('forgotPasswordLink').addEventListener('click', function (event) {
-                event.preventDefault(); // Prevent the default action of the link (i.e., navigating to its href)
-                window.location.href = 'forgot_password.html'; // Redirect the user to forgot_password.html
-            });
-        }
+    // Add event listener to the "Forgot Password" link
+    document.getElementById('forgotPasswordLink').addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent the default action of the link (i.e., navigating to its href)
+        window.location.href = 'forgot_password.html'; // Redirect the user to forgot_password.html
+    });
+}
 
         function showRegister() {
             hideAllSections();
@@ -897,58 +904,64 @@ function dismissReminder() {
             document.getElementById('collectionsSection').style.display = 'block';
         }
 
-        function showUpdateForm(taskId, taskText, priority, taskDate, taskTime) {
-            hideAllSections();
-            // Populate the update form fields with the task details
-            document.getElementById('updateTaskId').value = taskId;
-            document.getElementById('updateTaskText').value = taskText;
-            document.getElementById('updatePriority').value = priority;
-            document.getElementById('updateTaskDate').value = taskDate;
-            document.getElementById('updateTaskTime').value = taskTime;
+        function showUpdateForm(taskId, taskText, priority, taskDate, taskTime, reminderDate, reminderTime) {
+    hideAllSections();
+    // Populate the update form fields with the task details
+    document.getElementById('updateTaskId').value = taskId;
+    document.getElementById('updateTaskText').value = taskText;
+    document.getElementById('updatePriority').value = priority;
+    document.getElementById('updateTaskDate').value = taskDate;
+    document.getElementById('updateTaskTime').value = taskTime;
+    document.getElementById('updateReminderDate').value = reminderDate;
+    document.getElementById('updateReminderTime').value = reminderTime;
 
-            document.getElementById('updateTaskId').style.display = 'none';
+    document.getElementById('updateTaskId').style.display = 'none';
 
-            // Show the update form
-            document.getElementById('updateTaskForm').style.display = 'block';
-        }
+    // Show the update form
+    document.getElementById('updateTaskForm').style.display = 'block';
+}
 
-        function updateTask() {
-            const taskId = document.getElementById('updateTaskId').value;
-            const taskText = document.getElementById('updateTaskText').value.trim();
-            const priority = document.getElementById('updatePriority').value;
-            const taskDate = document.getElementById('updateTaskDate').value;
-            const taskTime = document.getElementById('updateTaskTime').value;
+function updateTask() {
+    const taskId = document.getElementById('updateTaskId').value;
+    const taskText = document.getElementById('updateTaskText').value.trim();
+    const priority = document.getElementById('updatePriority').value;
+    const taskDate = document.getElementById('updateTaskDate').value;
+    const taskTime = document.getElementById('updateTaskTime').value;
+    const reminderDate = document.getElementById('updateReminderDate').value; // Get reminder date value
+    const reminderTime = document.getElementById('updateReminderTime').value; // Get reminder time value
 
-            // Prepare updated task data
-            const updatedTaskData = {
-                task_text: taskText,
-                priority: priority,
-                date: taskDate,
-                time: taskTime,
-                created_at: new Date().toISOString() // Include the updated created_at timestamp
-            };
+    // Prepare updated task data
+    const updatedTaskData = {
+        task_text: taskText,
+        priority: priority,
+        date: taskDate,
+        time: taskTime,
+        reminder_date: reminderDate, // Include reminder date
+        reminder_time: reminderTime, // Include reminder time
+        created_at: new Date().toISOString() // Include the updated created_at timestamp
+    };
 
-            // Make a PUT request to update the task
-            fetch(`https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}&collection_name=april`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updatedTaskData)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Task updated successfully');
-                        // Optionally, refresh tasks after updating
-                        fetchTasks('april');
-                        // Hide the update form
-                        document.getElementById('updateTaskForm').style.display = 'none';
-                    } else {
-                        console.error('Error updating task:', response.statusText);
-                    }
-                })
-                .catch(error => console.error('Error updating task:', error));
-        }
+    // Make a PUT request to update the task
+    fetch(`https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}&collection_name=april`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedTaskData)
+    })
+        .then(response => {
+            if (response.ok) {
+                console.log('Task updated successfully');
+                // Optionally, refresh tasks after updating
+                fetchTasks('april');
+                // Hide the update form
+                document.getElementById('updateTaskForm').style.display = 'none';
+            } else {
+                console.error('Error updating task:', response.statusText);
+            }
+        })
+        .catch(error => console.error('Error updating task:', error));
+}
 
     </script>
 </body>
