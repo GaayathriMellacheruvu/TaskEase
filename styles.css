@@ -686,3 +686,52 @@ input[type="datetime-local"] {
         width: 90%; /* Adjust width for smaller screens */
     }
 }
+.priority-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.priority-container label {
+    margin-right: 10px;
+}
+
+#prioritySelect {
+    width: 100%;
+    max-width: 200px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#prioritySelect option {
+    padding: 8px;
+}
+
+/* Styling for when the dropdown is opened */
+#prioritySelect:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.select-priority {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 600px) {
+    select-priority {
+        font-size: 14px;
+    }
+}
