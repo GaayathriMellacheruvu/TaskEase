@@ -663,7 +663,7 @@
             };
 
             // Make a POST request to the API to add the task
-            fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=april`, {
+            fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=may`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -729,7 +729,7 @@
                 document.getElementById('chatLoader').style.display = 'block';
 
                 // Construct the URL with query parameters
-                const url = `https://task-ease-537o.onrender.com/tasks/chat_with_chatbot?user_input=${encodeURIComponent(chatInput)}&username=${encodeURIComponent(username)}&collection_name=april`;
+                const url = `https://task-ease-537o.onrender.com/tasks/chat_with_chatbot?user_input=${encodeURIComponent(chatInput)}&username=${encodeURIComponent(username)}&collection_name=may`;
 
                 // Make a POST request to the API to chat with the chatbot
                 fetch(url, {
@@ -900,7 +900,7 @@
             const reminderDate = new Date(dateTime).toISOString().split('T')[0];
             const reminderTime = new Date(dateTime).toTimeString().split(' ')[0];
 
-            fetch(`https://task-ease-537o.onrender.com/tasks/tasks/reminder/?username=${username}&collection_name=april&reminder_date=${reminderDate}&reminder_time=${reminderTime}`)
+            fetch(`https://task-ease-537o.onrender.com/tasks/tasks/reminder/?username=${username}&collection_name=may&reminder_date=${reminderDate}&reminder_time=${reminderTime}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -1000,7 +1000,7 @@
             };
 
             // Make a PUT request to update the task
-            fetch(`https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}&collection_name=april`, {
+            fetch(`https://task-ease-537o.onrender.com/tasks/update_task/${taskId}/?username=${username}&collection_name=may`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
