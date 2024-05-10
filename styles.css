@@ -1,5 +1,4 @@
 
-
 /* --- General Styles --- */
 body {
     font-family: 'Arial', sans-serif;
@@ -446,7 +445,7 @@ button {
     /* Adjust the gap as needed */
 }
 
-input[type="checkbox"] {
+input[type=""] {
     transform: scale(1.5);
     /* Increase the size of the checkbox */
     margin-right: 5px;
