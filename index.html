@@ -32,6 +32,7 @@
         <i></i>
     </button>
 
+
     <!-- Side Menu -->
     <div id="menu" class="menu">
         <br><br>
@@ -44,6 +45,7 @@
                     Task</a></li>
             <li><a href="#" onclick="viewCollections(); closeMenu()"><i class="fas fa-tasks"></i> View Tasks</a></li>
             <li><a href="#" onclick="showChat(); closeMenu()"><i class="fas fa-comments"></i> Chat</a></li>
+            <li><a href="about.html"><i class="fas fa-info-circle"></i> About TaskEase</a></li>
             <li><a href="#" onclick="logout(); closeMenu()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </div>
@@ -255,6 +257,17 @@
         });
 
 
+        // Add an event listener to the document body to detect clicks
+        document.body.addEventListener('click', function (event) {
+            var menu = document.getElementById("menu");
+            var toggleBtn = document.getElementById("toggleMenuBtn");
+
+            // Check if the clicked element is not the menu or toggle button
+            if (!menu.contains(event.target) && !toggleBtn.contains(event.target)) {
+                closeMenu();
+            }
+        });
+
         function toggleMenu() {
             var menu = document.getElementById("menu");
             menu.classList.toggle("menu-opened");
@@ -458,74 +471,75 @@
         });
 
         function login() {
-    var loginUsername = document.getElementById('loginUsername').value.trim();
-    var loginPassword = document.getElementById('loginPassword').value.trim();
-    if (loginUsername !== '' && loginPassword !== '') {
-        fetch('https://task-ease-537o.onrender.com/tasks/login/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                username: loginUsername,
-                password: loginPassword
-            })
-        })
-        .then(response => {
-            if (response.ok) {
-                username = loginUsername;
-                // Set a cookie or local storage item to keep the user logged in
-                localStorage.setItem('loggedInUser', username); // You can use localStorage or sessionStorage
-                // Show the pop-up message after successful login
-                showPopupMessage('Login successful!');
-                // Hide the login form
-                document.getElementById('loginForm').style.display = 'none';
+            var loginUsername = document.getElementById('loginUsername').value.trim();
+            var loginPassword = document.getElementById('loginPassword').value.trim();
+            if (loginUsername !== '' && loginPassword !== '') {
+                fetch('https://task-ease-537o.onrender.com/tasks/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        username: loginUsername,
+                        password: loginPassword
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            username = loginUsername;
+                            // Set a cookie or local storage item to keep the user logged in
+                            localStorage.setItem('loggedInUser', username); // You can use localStorage or sessionStorage
+                            // Show the pop-up message after successful login
+                            showPopupMessage('Login successful!');
+                            // Hide the login form
+                            document.getElementById('loginForm').style.display = 'none';
+                            // Show the task manager section
+                            document.getElementById('taskManager').style.display = 'block';
+                            // Show collections for the current month
+                            showCollectionsForCurrentMonth();
+                        } else if (response.status === 401) {
+                            document.getElementById('loginMessage').innerText = 'Login failed. Invalid credentials.';
+                            document.getElementById('loginMessage').style.color = 'red';
+                        } else {
+                            document.getElementById('loginMessage').innerText = 'Login failed. Please try again.';
+                            document.getElementById('loginMessage').style.color = 'red';
+                        }
+                    })
+                    .catch(error => console.error('Error logging in:', error));
+            } else {
+                alert('Please provide both username and password');
+            }
+        }
+
+        window.onload = function () {
+            // Check if the user is already logged in
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (loggedInUser) {
+                // Automatically log in the user
+                username = loggedInUser;
                 // Show the task manager section
                 document.getElementById('taskManager').style.display = 'block';
                 // Show collections for the current month
                 showCollectionsForCurrentMonth();
-            } else if (response.status === 401) {
-                document.getElementById('loginMessage').innerText = 'Login failed. Invalid credentials.';
-                document.getElementById('loginMessage').style.color = 'red';
+                // Hide the login form from the menu
+                document.getElementById('loginForm').style.display = 'none';
             } else {
-                document.getElementById('loginMessage').innerText = 'Login failed. Please try again.';
-                document.getElementById('loginMessage').style.color = 'red';
+                // Show the login form in the menu if not logged in
+                document.getElementById('menu').style.display = 'block';
             }
-        })
-        .catch(error => console.error('Error logging in:', error));
-    } else {
-        alert('Please provide both username and password');
-    }
-}
+        };
 
-window.onload = function () {
-    // Check if the user is already logged in
-    const loggedInUser = localStorage.getItem('loggedInUser');
-    if (loggedInUser) {
-        // Automatically log in the user
-        username = loggedInUser;
-        // Show the task manager section
-        document.getElementById('taskManager').style.display = 'block';
-        // Show collections for the current month
-        showCollectionsForCurrentMonth();
-        // Hide the login form from the menu
-        document.getElementById('loginForm').style.display = 'none';
-    } else {
-        // Show the login form in the menu if not logged in
-        document.getElementById('menu').style.display = 'block';
-    }
-};
+        function logout() {
+            // Clear user session or perform logout actions
+            localStorage.removeItem('loggedInUser'); // Remove the stored user identifier
+            username = null; // Clear the username
+            hideAllSections(); // Hide all sections after logout
+            showLogin(); // Show the login form again
+            // Reload the page
+            window.location.reload();
+        }
 
-function logout() {
-    // Clear user session or perform logout actions
-    localStorage.removeItem('loggedInUser'); // Remove the stored user identifier
-    username = null; // Clear the username
-    hideAllSections(); // Hide all sections after logout
-    showLogin(); // Show the login form again
-    // Reload the page
-    window.location.reload();
-}
-
+        //welcome popup message
         function showPopupMessage(message) {
             // Create a div for the pop-up message
             const popupDiv = document.createElement('div');
@@ -976,56 +990,56 @@ function logout() {
                 clearInterval(audioLoop);
             }
             if (popupLoop) {
-        clearInterval(popupLoop);
-    }
+                clearInterval(popupLoop);
+            }
         }
 
         var selectedCollectionName = ""; // Variable to store the selected collection name
 
-function displayCollections(collections) {
-    const collectionsDiv = document.getElementById('collections');
-    collectionsDiv.innerHTML = '';
+        function displayCollections(collections) {
+            const collectionsDiv = document.getElementById('collections');
+            collectionsDiv.innerHTML = '';
 
-    collections.forEach(collection => {
-        const collectionItem = document.createElement('div');
-        collectionItem.classList.add('collection-item');
-        collectionItem.innerHTML = `
+            collections.forEach(collection => {
+                const collectionItem = document.createElement('div');
+                collectionItem.classList.add('collection-item');
+                collectionItem.innerHTML = `
             <p>${collection}</p>
             <button type="button" class="primary-btn" onclick="selectCollection('${collection}')">View Tasks</button>                        
         `;
-        collectionsDiv.appendChild(collectionItem);
-    });
+                collectionsDiv.appendChild(collectionItem);
+            });
 
-    document.getElementById('collectionsSection').style.display = 'block';
-}
-
-function selectCollection(collectionName) {
-    selectedCollectionName = collectionName; // Store the selected collection name
-    viewTasks(collectionName); // Call the viewTasks function to display tasks for the selected collection
-}
-
-function deleteTask(taskId) {
-    // Use the stored selected collection name
-    fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}&collection_name=${selectedCollectionName}`, {
-        method: 'DELETE'
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error('Failed to delete task');
+            document.getElementById('collectionsSection').style.display = 'block';
         }
-    })
-    .then(data => {
-        console.log('Task deleted:', data.message);
-        // Optionally, refresh tasks after deletion
-        fetchTasks(selectedCollectionName); // Refresh tasks in the current collection
-    })
-    .catch(error => {
-        console.error('Error deleting task:', error);
-        // Handle error
-    });
-}
+
+        function selectCollection(collectionName) {
+            selectedCollectionName = collectionName; // Store the selected collection name
+            viewTasks(collectionName); // Call the viewTasks function to display tasks for the selected collection
+        }
+
+        function deleteTask(taskId) {
+            // Use the stored selected collection name
+            fetch(`https://task-ease-537o.onrender.com/tasks/delete_task/?username=${username}&task_id=${taskId}&collection_name=${selectedCollectionName}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to delete task');
+                    }
+                })
+                .then(data => {
+                    console.log('Task deleted:', data.message);
+                    // Optionally, refresh tasks after deletion
+                    fetchTasks(selectedCollectionName); // Refresh tasks in the current collection
+                })
+                .catch(error => {
+                    console.error('Error deleting task:', error);
+                    // Handle error
+                });
+        }
 
 
         function backToViewList() {
