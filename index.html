@@ -20,8 +20,8 @@
         </div>
     </header>
 
-    <!-- Animation
-    <div id="animationContainer" class="animation-container">
+    <!-- Animation -->
+    <!--<div id="animationContainer" class="animation-container">
         <img src="animation.gif" class="animation" alt="Animation">
     </div> -->
 
@@ -65,12 +65,19 @@
                 <h2>Login</h2>
                 <form id="loginForm">
                     <div class="form-group">
-                        <input type="text" id="loginUsername" class="form-control" placeholder="Username" required>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user fa-fw"></i></span>
+                            <input type="text" id="loginUsername" class="form-control" placeholder="Username" required>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <input type="password" id="loginPassword" class="form-control" placeholder="Password" required>
-                        <!-- Added password input field -->
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock fa-fw"></i></span>
+                            <input type="password" id="loginPassword" class="form-control" placeholder="Password"
+                                required>
+                        </div>
                     </div>
+
                     <button type="button" class="primary-btn" onclick="login()">Login</button>
                     <div id="loginMessage"></div>
                     <br>
@@ -86,14 +93,24 @@
                 <h2>Register</h2>
                 <form id="registerForm">
                     <div class="form-group">
-                        <input type="text" id="registerUsername" class="form-control" placeholder="Username" required>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user fa-fw"></i></span>
+                            <input type="text" id="registerUsername" class="form-control" placeholder="Username"
+                                required>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <input type="password" id="registerPassword" class="form-control" placeholder="Password"
-                            required>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock fa-fw"></i></span>
+                            <input type="password" id="registerPassword" class="form-control" placeholder="Password"
+                                required>
+                        </div>
                     </div>
                     <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope fa-fw"></i></span>
                         <input type="email" id="registerEmail" class="form-control" placeholder="Email" required>
+                    </div>
                     </div>
                     <button type="button" class="secondary-btn" onclick="registerUser()">Register</button>
                     <div id="registerMessage"></div>
@@ -500,9 +517,17 @@
                         } else if (response.status === 401) {
                             document.getElementById('loginMessage').innerText = 'Login failed. Invalid credentials.';
                             document.getElementById('loginMessage').style.color = 'red';
+                            // Clear the message after 3 seconds
+                            setTimeout(() => {
+                                document.getElementById('loginMessage').innerText = '';
+                            }, 3000);
                         } else {
                             document.getElementById('loginMessage').innerText = 'Login failed. Please try again.';
                             document.getElementById('loginMessage').style.color = 'red';
+                            // Clear the message after 3 seconds
+                            setTimeout(() => {
+                                document.getElementById('loginMessage').innerText = '';
+                            }, 3000);
                         }
                     })
                     .catch(error => console.error('Error logging in:', error));
@@ -735,6 +760,9 @@
                     document.getElementById('spokenTaskSavedMessage').innerText = 'Task saved successfully';
                     // Display the task saved message
                     document.getElementById('spokenTaskSavedMessage').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('spokenTaskSavedMessage').innerText = '';
+                    }, 3000);
                 })
                 .catch(error => {
                     console.error('Error adding task:', error);
@@ -791,6 +819,9 @@
                         // Display the response from the server in the chat output area
                         // Inside the function where you display the response from the chatbot
                         document.getElementById('chatOutput').innerHTML = `<div class="chatbot-response">${data.response}</div>`;
+                        setTimeout(() => {
+                            document.getElementById('chatOutput').innerText = '';
+                        }, 5000);
 
                         // Clear the input field
                         document.getElementById('chatInput').value = '';
@@ -869,6 +900,9 @@
                     document.getElementById('popupMessageContent').textContent = notificationMessage; // Update the content of the notification message box
                     showPopupMessageForNotif(notificationMessage); // Show the popup message
                 }, timeDifference);
+                setTimeout(() => {
+                    document.getElementById('reminderMessage').innerText = '';
+                }, 3000);
             } else {
                 alert('Please select a future date and time for the notification.');
             }
@@ -927,6 +961,9 @@
                 }, audio.duration * 1000);
             }
             showPopupMessageForNotif('Your reminder is set!', section);
+            setTimeout(() => {
+                document.getElementById('reminderMessage').innerText = '';
+            }, 3000);
         }
 
 
