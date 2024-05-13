@@ -21,7 +21,7 @@
     </header>
 
     <!-- Animation -->
-    <!--<div id="animationContainer" class="animation-container">
+    <!-- <div id="animationContainer" class="animation-container">
         <img src="animation.gif" class="animation" alt="Animation">
     </div> -->
 
@@ -109,8 +109,8 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-envelope fa-fw"></i></span>
-                        <input type="email" id="registerEmail" class="form-control" placeholder="Email" required>
-                    </div>
+                            <input type="email" id="registerEmail" class="form-control" placeholder="Email" required>
+                        </div>
                     </div>
                     <button type="button" class="secondary-btn" onclick="registerUser()">Register</button>
                     <div id="registerMessage"></div>
@@ -139,15 +139,11 @@
                             <label for="notificationDateTime">Enter Date and Time:</label>
                             <input type="datetime-local" id="notificationDateTime" name="notificationDateTime" required>
                             <!-- Add required attribute -->
-                            <button class="notifbtn" type="submit">Set Notification
+                            <button class="notifbtn" type="button" onclick="setNotification()">Set Notification
                                 <i class='far fa-bell' style='font-size:16px'></i>
                             </button>
-                            <div id="reminderMessage"></div>
                         </form>
-                        <div id="popupMessage" style="display: none;">
-                            <p id="popupMessageContent"></p> <!-- Display notification message here -->
-                            <button class="primary-btn" onclick="dismissReminder()">Okay</button>
-                        </div>
+                        
                     </div>
                     <!-- Add Priority Selection Dropdown -->
                     <div class="priority-container">
@@ -182,9 +178,7 @@
                             <button class="notifbtn" type="submit">Set Notification</button>
                             <div id="reminderMessageChat"></div>
                         </form>
-                        <div id="popupMessage" style="display: none;">
-                            NOTIFICATION <button class="primary-btn" onclick="dismissReminder()">Okay</button>
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -852,133 +846,50 @@
                 .catch(error => console.error('Error fetching collections:', error));
         }
 
+
+
         //Notifications function
 
-        let audioLoop;
-        let popupLoop; // Declare popupLoop variable globally
+        askForApproval();
 
-        // Check if the browser supports the Notification API
-        if (!("Notification" in window)) {
-            console.error("This browser does not support desktop notifications.");
-        } else {
-            // Check if the user has granted permission for notifications
-            if (Notification.permission !== 'granted') {
-                // If permission hasn't been granted, request it
-                Notification.requestPermission().then(function (permission) {
+        function askForApproval() {
+            if (Notification.permission === "granted") {
+                // Notification permission already granted
+            } else {
+                Notification.requestPermission(permission => {
                     if (permission === 'granted') {
-                        console.log("Notification permission granted.");
-                    } else {
-                        console.warn("Notification permission denied.");
+                        // Permission granted after request
                     }
                 });
             }
         }
 
-        // Check if the browser supports audio playback
-        let audioSupported = true;
-        try {
-            new Audio();
-        } catch (e) {
-            audioSupported = false;
-            console.error("This browser does not support audio playback.");
-        }
-
-        // Function to set notification
-        function setNotification(dateTime) {
-            const notificationTime = new Date(dateTime).getTime();
-            const currentTime = new Date().getTime();
-            if (notificationTime > currentTime) {
-                const timeDifference = notificationTime - currentTime;
-                document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
-                setTimeout(() => {
-                    fetchTaskByDateTime(dateTime);
-                    showNotification();
-                    // Show notification message when setting notification
-                    const notificationMessage = 'Your reminder is set!'; // Set the notification message
-                    document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
-                    document.getElementById('reminderMessageChat').textContent = 'Your reminder is set!';
-                    document.getElementById('popupMessageContent').textContent = notificationMessage; // Update the content of the notification message box
-                    showPopupMessageForNotif(notificationMessage); // Show the popup message
-                }, timeDifference);
-                setTimeout(() => {
-                    document.getElementById('reminderMessage').innerText = '';
-                }, 3000);
-            } else {
-                alert('Please select a future date and time for the notification.');
-            }
-        }
-
-        // Function to show popup message with custom text
-        function showPopupMessageForNotif(message) {
-            const popup = document.getElementById('popupMessage');
-            popup.textContent = message; // Set the content of the popup to the custom message
-            popup.style.display = 'block';
-            document.body.appendChild(popup);
-            // Clear existing popup loop
-
-            // Create "Okay" button
-            const okayButton = document.createElement('button');
-            okayButton.textContent = 'Okay';
-            okayButton.addEventListener('click', function () {
-                clearInterval(popupLoop); // Stop the popup loop interval
-                dismissReminder(); // Dismiss the reminder
+        function createNotification(title, text, icon) {
+            const noti = new Notification(title, {
+                body: text,
+                icon
             });
-            popup.appendChild(okayButton); // Append the "Okay" button to the popup
-
-            // Append the popup to the body element
-            document.body.appendChild(popup);
-            if (popupLoop) {
-                clearInterval(popupLoop);
-            }
-
-            // Start a new popup loop
-            popupLoop = setInterval(() => {
-                popup.style.display = 'none';
-                setTimeout(() => {
-                    popup.style.display = 'block';
-                }, 1000); // Adjust time interval between popup appearances as needed
-            }, 5000); // Adjust total duration of popup loop as needed
         }
 
-        // Function to show notification
-        function showNotification() {
-            if (!document.hasFocus()) {
-                // Show notification only when the document is not focused and permission is granted
-                if (Notification.permission === 'granted') {
-                    const notification = new Notification('Notification', {
-                        body: 'This is your notification!'
-                    });
-                    // Close notification after 5 seconds
-                    setTimeout(notification.close.bind(notification), 5000);
-                }
+        function setNotification() {
+            const notificationDateTime = document.getElementById("notificationDateTime").value;
+            const notificationTime = new Date(notificationDateTime).getTime();
+            const currentTime = new Date().getTime();
+            alert("Notification set successfully!");
+            const timeDiff = notificationTime - currentTime;
+
+            if (timeDiff > 0) {
+                setTimeout(function() {
+                    createNotification('Notification Title', 'Notification Text', 'notification-icon.png');
+                    
+                }, timeDiff);
+            } else {
+                alert("Please select a future date and time.");
             }
-            // Play notification sound only when the document is focused and audio is supported
-            if (document.hasFocus() && audioSupported) {
-                const audio = new Audio('notification_sound.mp3');
-                audio.play();
-                audioLoop = setInterval(() => {
-                    audio.play();
-                }, audio.duration * 1000);
-            }
-            showPopupMessageForNotif('Your reminder is set!', section);
-            setTimeout(() => {
-                document.getElementById('reminderMessage').innerText = '';
-            }, 3000);
         }
 
 
-        // Handle form submissions
-        document.getElementById('notificationForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const notificationDateTime = document.getElementById('notificationDateTime').value;
-            setNotification(notificationDateTime);
-        });
 
-        document.getElementById('chatNotificationForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const chatNotificationDateTime = document.getElementById('chatNotificationDateTime').value;
-            setNotification(chatNotificationDateTime);
-        });
 
         // Function to fetch task by date and time
         function fetchTaskByDateTime(dateTime) {
