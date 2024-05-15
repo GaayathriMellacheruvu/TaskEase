@@ -109,7 +109,7 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-envelope fa-fw"></i></span>
-                            <input type="email" id="registerEmail" class="form-control" placeholder="Email" required>
+                            <input type="email" id="registerEmail" class="form-control" placeholder="user@gmail.com" required>
                         </div>
                     </div>
                     <button type="button" class="secondary-btn" onclick="registerUser()">Register</button>
@@ -136,14 +136,23 @@
                     <div>
                         <label><b>Set Notification Reminder</b></label>
                         <form id="notificationForm">
-                            <label for="notificationDateTime">Enter Date and Time:</label>
-                            <input type="datetime-local" id="notificationDateTime" name="notificationDateTime" required>
-                            <!-- Add required attribute -->
+                            <div class="form-group">
+                                <label for="notificationDate">Enter Date:</label>
+                                <input type="date" id="notificationDate" name="notificationDate" class="form-control"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="notificationTime">Enter Time:</label>
+                                <input type="time" id="notificationTime" name="notificationTime" class="form-control"
+                                    required>
+                            </div>
                             <button class="notifbtn" type="button" onclick="setNotification()">Set Notification
                                 <i class='far fa-bell' style='font-size:16px'></i>
                             </button>
+                            <div id="reminderMessage"></div>
                         </form>
-                        
+
+
                     </div>
                     <!-- Add Priority Selection Dropdown -->
                     <div class="priority-container">
@@ -159,27 +168,30 @@
                     <div id="spokenTaskSavedMessage" style="display: none;">Task saved successfully!</div>
                 </div>
 
-                <!-- Chat Section -->
+                <!-- chat Section -->
                 <div class="task-input" id="chatSection" style="display: none;">
                     <!-- Chat input -->
                     <label for="chatInput"><b>Chat with the Task Manager:</b></label>
-                    <div class="input-group mb-3">
+                    <div class="input-group mb-3" style="position: relative;">
                         <input type="text" id="chatInput" class="form-control" placeholder="Type your message here...">
                         <button type="button" class="primary-btn" onclick="chatWithAssistant()">Send <i
                                 class="fas fa-paper-plane"></i></button>
                     </div>
+
+                    <!-- Chat output -->
                     <div id="chatOutput"></div>
-                    <div id="chatLoader" style="display: none;" class="loading"></div>
-                    <div>
-                        <label><b>Set Notification Reminder</b></label>
-                        <form id="chatNotificationForm">
-                            <label for="chatNotificationDateTime">Enter Date and Time:</label>
-                            <input type="datetime-local" id="chatNotificationDateTime" name="chatNotificationDateTime">
-                            <button class="notifbtn" type="submit">Set Notification</button>
-                            <div id="reminderMessageChat"></div>
-                        </form>
-                        
+
+                    <!-- Reminder date and time inputs -->
+                    <div id="reminderInput" class="reminder-input" style="display: none;">
+                        <label for="reminderDate">Reminder Date:</label>
+                        <input type="date" id="reminderDate" class="form-control">
+                        <label for="reminderTime">Reminder Time:</label>
+                        <input type="time" id="reminderTime" class="form-control">
+                        <button type="button" class="primary-btn mt-3" onclick="setReminder()">Set Reminder</button>
                     </div>
+
+                    <!-- Chat loader -->
+                    <div id="chatLoader" style="display: none;" class="loading"></div>
                 </div>
 
                 <!-- Update Task Form -->
@@ -238,6 +250,8 @@
                         <option value="default">Sort by Priority</option>
                         <option value="HighToLow">High to Low</option>
                         <option value="LowToHigh">Low to High</option>
+                        <option value="RecentlyAdded">Recently Added</option>
+                        <option value="OldestFirst">Oldest First</option>
                     </select>
                     <div id="tasks" class="tasks"></div>
                 </div>
@@ -318,19 +332,50 @@
             const tasksDiv = document.getElementById('tasks');
             const tasks = Array.from(tasksDiv.children);
 
-            tasks.sort((a, b) => {
-                const priorityA = a.querySelector('.priority').innerText;
-                const priorityB = b.querySelector('.priority').innerText;
+            // If sortBy is "RecentlyAdded", reverse the order of tasks
+            if (sortBy === 'RecentlyAdded') {
+                tasks.reverse();
+            }
+            // If not "RecentlyAdded", sort the tasks
+            else {
+                // Implement sorting logic based on other options (e.g., priority)
+                tasks.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'HighToLow':
+                            return getPriorityValue(b.querySelector('.priority').innerText) - getPriorityValue(a.querySelector('.priority').innerText);
+                        case 'LowToHigh':
+                            return getPriorityValue(a.querySelector('.priority').innerText) - getPriorityValue(b.querySelector('.priority').innerText);
+                        case 'OldestFirst':
+                            return new Date(getTaskCreatedAt(a)) - new Date(getTaskCreatedAt(b));
+                        default:
+                            return 0;
+                    }
+                });
+            }
 
-                if (sortBy === 'HighToLow') {
-                    return getPriorityValue(priorityB) - getPriorityValue(priorityA); // Sort high to low
-                } else if (sortBy === 'LowToHigh') {
-                    return getPriorityValue(priorityA) - getPriorityValue(priorityB); // Sort low to high
-                }
-            });
-
+            // Re-append sorted tasks to the tasksDiv
             tasks.forEach(task => tasksDiv.appendChild(task));
         }
+
+        // Helper function to get priority value
+        function getPriorityValue(priority) {
+            switch (priority.toLowerCase()) {
+                case 'high':
+                    return 3;
+                case 'medium':
+                    return 2;
+                case 'low':
+                    return 1;
+                default:
+                    return 0;
+            }
+        }
+
+        // Helper function to get the created-at attribute value
+        function getTaskCreatedAt(taskElement) {
+            return taskElement.getAttribute('created_at');
+        }
+
 
         function displayTasks(tasks) {
             const tasksDiv = document.getElementById('tasks');
@@ -355,6 +400,7 @@
                     <p><strong>Time:</strong> ${task.time}</p>
                     <p><strong>Reminder Date:</strong> ${task.reminder_date}</p>
                     <p><strong>Reminder Time:</strong> ${task.reminder_time}</p>
+                    <p><strong>CreatedAt:</strong> ${task.created_at}</p>
                 `;
                 detailsDiv.style.display = 'none';
 
@@ -413,19 +459,7 @@
             document.getElementById('tasksSection').style.display = 'block';
         }
 
-        // Helper function to get priority value
-        function getPriorityValue(priority) {
-            switch (priority.toLowerCase()) {
-                case 'high':
-                    return 3;
-                case 'medium':
-                    return 2;
-                case 'low':
-                    return 1;
-                default:
-                    return 0;
-            }
-        }
+
 
         function updateTaskCompletion(taskId, completed) {
             fetch('mongodb+srv://taskease:102938@cluster0.kavkfm1.mongodb.net/', {
@@ -676,53 +710,48 @@
             stopRecording();
 
             var spokenTask = spokenTaskDiv.innerText.trim();
-            var notificationDateTime = document.getElementById('notificationDateTime').value.trim(); // Get the value of the notification date and time input
-            var priority = document.getElementById('prioritySelect').value; // Get the selected priority from the dropdown
+            var notificationDate = document.getElementById('notificationDate').value.trim();
+            var notificationTime = document.getElementById('notificationTime').value.trim();
+            var priority = document.getElementById('prioritySelect').value;
 
-            if (username && spokenTask !== '' && notificationDateTime !== '') { // Check if the spoken task and notification date/time are not empty
-                // Inside the saveSpokenTask() function after successfully saving the spoken task
+            if (username && spokenTask !== '' && notificationDate !== '' && notificationTime !== '') {
                 document.getElementById('spokenTextLoader').style.display = 'block';
 
-                var notificationDate = new Date(notificationDateTime).toISOString().split('T')[0];
-                var notificationTime = new Date(notificationDateTime).toTimeString().split(' ')[0];
+                addTask(spokenTask, notificationDate, notificationTime, priority);
 
-                addTask(spokenTask, notificationDate, notificationTime, priority); // Pass the selected priority to addTask
-
-                // Display spoken task in a box if the element exists
                 var spokenTaskElement = document.getElementById('spokenTask');
                 if (spokenTaskElement) {
                     spokenTaskElement.innerText = spokenTask;
                 }
 
-                // Display the spoken task container if the element exists
                 var spokenTaskContainer = document.getElementById('spokenTaskContainer');
                 if (spokenTaskContainer) {
                     spokenTaskContainer.style.display = 'block';
                 }
 
-                // Display a message to the user that the task is saved
                 document.getElementById('spokenTaskSavedMessage').innerText = 'Task saved successfully';
 
-                // Clear input box, reset dropdown, and refresh options
                 spokenTaskDiv.innerText = '';
-                document.getElementById('notificationDateTime').value = '';
+                document.getElementById('notificationDate').value = '';
+                document.getElementById('notificationTime').value = '';
                 document.getElementById('prioritySelect').selectedIndex = 0;
 
-                // Check if the taskSavedMessage element exists before attempting to modify its style
                 var taskSavedMessage = document.getElementById('taskSavedMessage');
                 if (taskSavedMessage) {
                     taskSavedMessage.style.display = 'block';
                 }
+
+                // Set notification with the saved task
+                setNotification(spokenTask, notificationDate, notificationTime);
+
             } else {
                 alert('Please provide both spoken task and notification date/time.');
             }
         }
 
         function addTask(taskText, reminderDate, reminderTime, priority) {
-
             var collectionName = get_collection_name();
 
-            // Prepare task data
             var taskData = {
                 task_text: taskText,
                 priority: priority,
@@ -731,7 +760,6 @@
                 created_at: new Date().toISOString()
             };
 
-            // Make a POST request to the API to add the task
             fetch(`https://task-ease-537o.onrender.com/tasks/add_task?username=${username}&collection_name=${collectionName}`, {
                 method: 'POST',
                 headers: {
@@ -748,11 +776,8 @@
                 })
                 .then(data => {
                     console.log('Task added successfully:', data.message);
-                    // Hide the loading animation
                     document.getElementById('spokenTextLoader').style.display = 'none';
-                    // Show a success message or perform any other actions
                     document.getElementById('spokenTaskSavedMessage').innerText = 'Task saved successfully';
-                    // Display the task saved message
                     document.getElementById('spokenTaskSavedMessage').style.display = 'block';
                     setTimeout(() => {
                         document.getElementById('spokenTaskSavedMessage').innerText = '';
@@ -760,11 +785,12 @@
                 })
                 .catch(error => {
                     console.error('Error adding task:', error);
-                    // Hide the loading animation on error as well
                     document.getElementById('spokenTextLoader').style.display = 'none';
-                    // Show an error message or perform error handling
                 });
         }
+
+
+
 
         function get_collection_name() {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -795,11 +821,39 @@
             document.getElementById('updateTaskForm').style.display = 'none';
         }
 
+
+
+        const chatInput = document.getElementById('chatInput');
+
+        // Add event listener for key press
+        chatInput.addEventListener('keypress', function(event) {
+            // Check if the pressed key is Enter
+            if (event.key === 'Enter') {
+                // Call chatWithAssistant function when Enter key is pressed
+                chatWithAssistant();
+            }
+        });
+
+        //CHAT WINDOW
+        let tempTaskText = ""; // Variable to store temporary task text
+        let tempResponse = ""; // Variable to store temporary response
+
         function chatWithAssistant() {
+            // Clear previous chat output and related elements
+            document.getElementById('chatOutput').innerHTML = ''; // Clear chat output
+            document.getElementById('reminderInput').style.display = 'none'; // Hide reminder input
+            const viewTasksButton = document.getElementById('viewTasksButton');
+            if (viewTasksButton) {
+                viewTasksButton.remove(); // Remove view tasks button if exists
+            }
+            
             var collectionName = get_collection_name();
             const chatInput = document.getElementById('chatInput').value.trim();
             if (chatInput !== '') {
                 document.getElementById('chatLoader').style.display = 'block';
+
+                // Check if the input starts with "add task" and remove it if present
+                const taskDescription = chatInput.toLowerCase().startsWith('add task') ? chatInput.slice(9).trim() : chatInput;
 
                 // Construct the URL with query parameters
                 const url = `https://task-ease-537o.onrender.com/tasks/chat_with_chatbot?user_input=${encodeURIComponent(chatInput)}&username=${encodeURIComponent(username)}&collection_name=${collectionName}`;
@@ -810,12 +864,37 @@
                 })
                     .then(response => response.json())
                     .then(data => {
+                        // Store temporary task text and response
+                        tempTaskText = taskDescription; // Store only the task description
+                        tempResponse = data.response;
+
                         // Display the response from the server in the chat output area
-                        // Inside the function where you display the response from the chatbot
                         document.getElementById('chatOutput').innerHTML = `<div class="chatbot-response">${data.response}</div>`;
                         setTimeout(() => {
                             document.getElementById('chatOutput').innerText = '';
-                        }, 5000);
+                        }, 30000);
+
+                        if (
+                            tempResponse.trim().toLowerCase() === "to view all tasks, just send a message like 'view tasks' or 'display tasks' to taskease. the other way is to choose particular month for viewing tasks by clicking below button available." ||
+                            tempResponse.trim().toLowerCase() === "to update a task, send a message like 'update task [task id] to [new description]' to taskease. the other way is to update manually in your view tasks of respective month by clicking below button available." ||
+                            tempResponse.trim().toLowerCase() === "to delete a task, simply message 'delete task [task id]' to taskease. the other way is to delete manually in your view tasks of respective month by clicking below button available."
+                        ) {
+                            // Show button to view tasks
+                            const viewTasksButton = document.createElement('button');
+                            viewTasksButton.textContent = 'View Tasks';
+                            viewTasksButton.className = 'view-tasks-button'; // Add the CSS class
+                            viewTasksButton.id = 'viewTasksButton'; // Add an ID
+                            viewTasksButton.addEventListener('click', () => {
+                                fetchTasks(collectionName);
+                            });
+                            document.getElementById('chatOutput').appendChild(viewTasksButton);
+                        }
+
+                        if (tempResponse.trim().toLowerCase() === "please provide reminder date and time.") {
+                            // Show calendar to set reminder date and time
+                            console.log("Attempting to show calendar...");
+                            showCalendar();
+                        }
 
                         // Clear the input field
                         document.getElementById('chatInput').value = '';
@@ -829,6 +908,60 @@
                     });
             }
         }
+
+
+        function showCalendar() {
+            const reminderInput = document.getElementById('reminderInput');
+            reminderInput.style.display = 'block';
+        }
+
+        function closeCalendar() {
+            // Close the calendar modal
+            document.getElementById('calendarModal').style.display = 'none';
+        }
+
+        function setReminder() {
+            // Get the selected reminder date and time
+            const reminderDate = document.getElementById('reminderDate').value;
+            const reminderTime = document.getElementById('reminderTime').value;
+
+            // Call the addTask function with temporary task text, reminder date, reminder time, and default priority
+            addTask(tempTaskText, reminderDate, reminderTime, "Medium");
+
+            // Print "Task added successfully" message below the "Set Reminder" button
+            const reminderInput = document.getElementById('reminderInput');
+            const successMessage = document.createElement('div');
+            successMessage.classList.add('chatbot-response');
+            successMessage.textContent = 'Task added successfully';
+            reminderInput.appendChild(successMessage);
+
+            // Set notification for the reminder
+            const notificationDateTime = `${reminderDate}T${reminderTime}`;
+            setChatNotification(tempTaskText, notificationDateTime);
+
+            // Close the calendar modal after setting the reminder
+            closeCalendar();
+        }
+
+        function setChatNotification(taskText, notificationDateTime) {
+            const notificationTime = new Date(notificationDateTime).getTime();
+            const currentTime = new Date().getTime();
+            const timeDiff = notificationTime - currentTime;
+            const iconUrl = 'logo.jpg';
+
+            if (timeDiff > 0) {
+                setTimeout(function () {
+                    createNotification('Task Reminder', taskText, 'logo.jpg');
+                }, timeDiff);
+            } else {
+                document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
+                setTimeout(() => {
+                    document.getElementById('reminderMessage').innerText = '';
+                }, 3000);
+            }
+        }
+
+
 
         function viewCollections() {
             hideAllSections();
@@ -867,80 +1000,30 @@
         function createNotification(title, text, icon) {
             const noti = new Notification(title, {
                 body: text,
-                icon
+                icon: icon
             });
         }
 
-        function setNotification() {
-            const notificationDateTime = document.getElementById("notificationDateTime").value;
-            const notificationTime = new Date(notificationDateTime).getTime();
+        function setNotification(spokenTask, notificationDate, notificationTime) {
+            const notificationDateTime = new Date(notificationDate + 'T' + notificationTime).getTime();
             const currentTime = new Date().getTime();
-            alert("Notification set successfully!");
-            const timeDiff = notificationTime - currentTime;
+            const timeDiff = notificationDateTime - currentTime;
+            const iconUrl = 'logo.jpg';
 
             if (timeDiff > 0) {
-                setTimeout(function() {
-                    createNotification('Notification Title', 'Notification Text', 'notification-icon.png');
-                    
+                setTimeout(function () {
+                    createNotification('Task Reminder', spokenTask, 'logo.jpg');
                 }, timeDiff);
             } else {
-                alert("Please select a future date and time.");
+                document.getElementById('reminderMessage').textContent = 'Your reminder is set!';
+                setTimeout(() => {
+                    document.getElementById('reminderMessage').innerText = '';
+                }, 3000);
             }
         }
 
 
 
-
-        // Function to fetch task by date and time
-        function fetchTaskByDateTime(dateTime) {
-            var collectionName = get_collection_name();
-            const reminderDate = new Date(dateTime).toISOString().split('T')[0];
-            const reminderTime = new Date(dateTime).toTimeString().split(' ')[0];
-
-            fetch(`https://task-ease-537o.onrender.com/tasks/tasks/reminder/?username=${username}&collection_name=${collectionName}&reminder_date=${reminderDate}&reminder_time=${reminderTime}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('API Response:', data); // Log the response data to inspect its structure
-                    if (data.tasks && data.tasks.length > 0) {
-                        const taskText = data.tasks[0]; // Fetch task text
-                        const notificationMessage = `This is your notification! \n\n Task: ${taskText}`; // Combine notification message and task text
-                        showPopupMessageForNotif(notificationMessage); // Pass the combined message to the popup function
-                        // Show the "Okay" button on the notification
-                        const okayButton = document.createElement('button');
-                        okayButton.textContent = 'Okay';
-                        okayButton.addEventListener('click', function () {
-                            clearInterval(popupLoop); // Stop the popup loop interval
-                            dismissReminder(); // Dismiss the reminder
-                        });
-                        document.getElementById('popupMessage').appendChild(okayButton);
-                    } else {
-                        console.log('No task found for the reminder.');
-                    }
-                })
-                .catch(error => console.error('Error fetching task:', error));
-        }
-
-        // Function to dismiss the reminder
-        function dismissReminder() {
-            const popup = document.getElementById('popupMessage');
-            popup.style.display = 'none'; // Hide the popup
-
-            popup.parentNode.removeChild(popup);
-
-
-            // Stop the audio loop if it's playing
-            if (audioLoop) {
-                clearInterval(audioLoop);
-            }
-            if (popupLoop) {
-                clearInterval(popupLoop);
-            }
-        }
 
         var selectedCollectionName = ""; // Variable to store the selected collection name
 
