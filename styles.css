@@ -766,3 +766,62 @@ input[type="datetime-local"] {
         margin-bottom: 40px; /* Adjust margin for smaller footers */
     }
 }
+
+/* Responsive layout for reminder date and time input */
+#reminderDateTimeInput {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#reminderDateTimeInput label {
+    margin-bottom: 10px;
+}
+
+#reminderDateTimeInput input {
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#reminderDateTimeInput button {
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#reminderDateTimeInput button:hover {
+    background-color: #0056b3;
+}
+
+/* Style for the View Tasks button */
+button.view-tasks-button {
+    background-color: #007BFF; /* Primary color */
+    color: #ffffff; /* White text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Padding for size */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin-top: 10px; /* Space above the button */
+    margin-bottom: 20px;
+}
+
+/* Hover effect */
+button.view-tasks-button:hover {
+    background-color: #0056b3; /* Darker shade of primary color */
+}
+
+/* Focus effect */
+button.view-tasks-button:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Custom focus shadow */
+}
