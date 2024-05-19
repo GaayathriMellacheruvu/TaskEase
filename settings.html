@@ -26,18 +26,27 @@
             <main>
                 <section class="settings">
                     <h2>Settings</h2>
-                    <div class="toggle">
+                    <div class="toggle" onclick="toggleDarkMode()">
                         <label for="darkModeToggle">Dark Mode</label>
-                        <input type="checkbox" id="darkModeToggle" onclick="toggleDarkMode()">
+                        <div id="darkModeToggle" class="toggle-switch"></div>
                     </div>
                     <div class="font-settings">
-                        <label for="fontFamily">Font Family</label>
+                        <label for="fontFamily">Font</label>
                         <select id="fontFamily" onchange="changeFontFamily()">
                             <option value="Arial, sans-serif">Arial</option>
                             <option value="Verdana, sans-serif">Verdana</option>
                             <option value="Tahoma, sans-serif">Tahoma</option>
                             <option value="Georgia, serif">Georgia</option>
                             <option value="Times New Roman, serif">Times New Roman</option>
+                            <option value="Courier New, monospace">Courier New</option>
+                            <option value="Lucida Sans Unicode, Lucida Grande, sans-serif">Lucida Sans Unicode</option>
+                            <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+                            <option value="Comic Sans MS, cursive, sans-serif">Comic Sans MS</option>
+                            <option value="Impact, Charcoal, sans-serif">Impact</option>
+                            <option value="Palatino Linotype, Book Antiqua, Palatino, serif">Palatino Linotype</option>
+                            <option value="Arial Black, Gadget, sans-serif">Arial Black</option>
+                            <option value="Gill Sans, Gill Sans MT, Calibri, sans-serif">Gill Sans</option>
+                            <option value="Helvetica, sans-serif">Helvetica</option>
                         </select>
                         <label for="fontSize">Font Size</label>
                         <select id="fontSize" onchange="changeFontSize()">
@@ -52,12 +61,28 @@
                             <option value="#ffffff">White</option>
                             <option value="#f8f9fa">Light Gray</option>
                             <option value="#e0e0e0">Silver</option>
+                            <option value="#fffff0">Ivory</option>
+                            <option value="#fff0f5">Lavender Blush</option>
+                            <option value="#f5fffa">Mint Cream</option>
+                            <option value="#f0f8ff">Alice Blue</option>
+                            <option value="#f0fff0">Honeydew</option>
+                            <option value="#fffaf0">Floral White</option>
+                            <option value="#fdf5e6">Old Lace</option>
+                            <option value="#fff5ee">Seashell</option>
                         </select>
                         <label for="darkThemeColor">Dark Theme Color</label>
                         <select id="darkThemeColor" onchange="changeThemeColor('dark')">
                             <option value="#1e1e1e">Dark Gray</option>
                             <option value="#333333">Dim Gray</option>
                             <option value="#4f4f4f">Gray</option>
+                            <option value="#36454f">Charcoal</option>
+                            <option value="#2a3439">Gunmetal</option>
+                            <option value="#555d50">Ebony</option>
+                            <option value="#242124">Raisin Black</option>
+                            <option value="#2f4f4f">Dark Slate Gray</option>
+                            <option value="#343434">Jet</option>
+                            <option value="#414a4c">Outer Space</option>
+                            <option value="#1b1b1b">Eerie Black</option>
                         </select>
                     </div>
                 </section>
@@ -95,50 +120,34 @@
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 40px;
-            height: 20px;
+            width: 50px;
+            height: 25px;
             background-color: #ccc;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
+            transition: background-color 0.4s;
         }
 
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: white;
-            border-radius: 20px;
-            transition: 0.4s;
-        }
-
-        .toggle-slider::before {
+        .toggle-switch::before {
             content: "";
             position: absolute;
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: #4caf50;
+            width: 21px;
+            height: 21px;
             border-radius: 50%;
-            transition: transform 0.3s;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.4s;
         }
 
-        .toggle-switch input[type="checkbox"]:checked + .toggle-slider {
+        .toggle-switch.active {
             background-color: #4caf50;
         }
 
-        .toggle-switch input[type="checkbox"]:checked + .toggle-slider::before {
-            transform: translateX(20px);
+        .toggle-switch.active::before {
+            transform: translateX(25px);
         }
 
-        .toggle-switch input[type="checkbox"] {
-            display: none;
-        }
-        
-        
         /* Light mode dropdown styles */
         .settings select {
             background-color: #ffffff;
@@ -151,7 +160,7 @@
 
         /* Dark mode dropdown styles */
         body.dark-mode .settings select {
-            background-color: #2c3e50;
+            background-color: #1e1e1e;
             color: #ffffff;
             border: 1px solid #555;
             border-radius: 5px;
@@ -164,15 +173,16 @@
         // Function to toggle dark mode
         function toggleDarkMode() {
             var darkModeToggle = document.getElementById("darkModeToggle");
-            if (darkModeToggle.checked) {
-                setDarkMode();
-                document.getElementById("lightThemeColor").disabled = true;
-                document.getElementById("darkThemeColor").disabled = false;
-            } else {
+            if (document.body.classList.contains("dark-mode")) {
                 setLightMode();
                 document.getElementById("lightThemeColor").disabled = false;
                 document.getElementById("darkThemeColor").disabled = true;
+            } else {
+                setDarkMode();
+                document.getElementById("lightThemeColor").disabled = true;
+                document.getElementById("darkThemeColor").disabled = false;
             }
+            darkModeToggle.classList.toggle("active");
         }
 
         // Function to set light mode
