@@ -1,0 +1,1434 @@
+
+/* --- General Styles --- */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f3f4f6;
+    color: #333;
+    overflow-x: hidden;
+}
+
+/* Header Styles */
+.header {
+    background-color: #3498db;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.header-title {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+.header-tagline {
+    margin-top: 5px;
+}
+
+
+/* Side Menu Styles */
+.menu {
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(to bottom, #405b70, #293f50);
+    position: fixed;
+    top: 0;
+    left: -250px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    padding-top: 20px;
+    color: #fff;
+}
+
+.menu-opened {
+    left: 0;
+}
+
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu li {
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.menu li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu a {
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.menu a i {
+    margin-right: 10px;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.toggle-menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 0;
+    /* Make edges rectangular */
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+    background-color: transparent;
+    /* Remove background color */
+}
+
+
+.toggle-menu-btn i {
+    font-size: 20px;
+    display: block;
+    width: 30px;
+    height: 3px;
+    background-color: #fff;
+    margin-bottom: 5px;
+    border-radius: 3px;
+}
+
+/* Main Content Styles */
+.content {
+    margin: 0 auto;
+    /* Center content horizontally */
+    padding: 20px;
+}
+
+
+.container {
+    background-color: #ecf0f1;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+
+}
+
+/* Form Section Styles */
+.form-section {
+    margin-bottom: 20px;
+}
+
+/* Task Manager Styles */
+.task-manager {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Chat Section Styles */
+.chat-section input[type="text"] {
+    width: calc(100% - 80px);
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+}
+
+.chat-section button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+
+/* Add this to your styles.css file or include it within the <style> tags in your HTML */
+.chatbot-response {
+    background-color: #cce5ff;
+    /* Light blue background color */
+    border-radius: 5px;
+    /* Rounded corners */
+    padding: 10px;
+    /* Padding inside the box */
+    margin-bottom: 20px;
+    /* Margin between each response box and other elements */
+    margin-top: 20px;
+    /* Gap above the response box */
+}
+
+
+.spoken-task {
+    background-color: #cce5ff;
+    /* Light blue background color */
+    border-radius: 5px;
+    /* Rounded corners */
+    padding: 10px;
+    /* Padding inside the box */
+    margin-bottom: 20px;
+    /* Margin between each response box and other elements */
+    margin-top: 20px;
+    /* Gap above the response box */
+}
+
+
+
+/* Add this to your styles.css file or include it within the <style> tags in your HTML */
+
+@keyframes loading {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #333;
+    /* Color of the loading animation */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: loading 1s linear infinite;
+    /* Animation properties */
+}
+
+
+/* Tasks Section Styles */
+.tasks-section h2 {
+    margin-bottom: 10px;
+}
+
+.tasks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.task-item {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 1 0 30%;
+}
+
+.task-item p {
+    margin: 0 0 10px;
+}
+
+.task-item button {
+    padding: 5px 10px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* Button Styles */
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    /* Adjust the border-radius for curved edges */
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+}
+
+/* Primary Button */
+.primary-btn {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.primary-btn:hover {
+    background-color: #2980b9;
+}
+
+/* Secondary Button */
+.secondary-btn {
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+.secondary-btn:hover {
+    background-color: #27ae60;
+}
+
+/* Danger Button */
+.danger-btn {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.danger-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Success Button */
+.success-btn {
+    background-color: #f39c12;
+    color: #fff;
+}
+
+.success-btn:hover {
+    background-color: #d35400;
+}
+
+/* Info Button */
+.info-btn {
+    background-color: #9b59b6;
+    color: #fff;
+}
+
+.info-btn:hover {
+    background-color: #8e44ad;
+}
+
+/* Warning Button */
+.warning-btn {
+    background-color: #f1c40f;
+    color: #fff;
+}
+
+.warning-btn:hover {
+    background-color: #f39c12;
+}
+
+/* Neat Input Text Box Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.form-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.popup-message-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
+    backdrop-filter: blur(5px);
+    /* Blur effect */
+    z-index: 9998;
+    /* Ensure it's behind the pop-up */
+    display: none;
+    /* Initially hidden */
+}
+
+.popup-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    /* Rounded edges */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Improved box shadow */
+    z-index: 9999;
+    max-width: 80%;
+    /* Maximum width for responsiveness */
+    width: 400px;
+    /* Initial width */
+}
+
+.popup-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;
+    /* Close button color */
+    transition: color 0.3s;
+    /* Smooth transition */
+}
+
+.close-btn:hover {
+    color: #555;
+    /* Hover color */
+}
+
+.okay-btn {
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.okay-btn:hover {
+    background-color: #0056b3;
+}
+
+.profile-section {
+    text-align: center;
+}
+
+.profile-section img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    /* Add a gap between buttons */
+}
+
+.button-container button {
+    flex: 1;
+    /* Make buttons take equal space */
+    margin-right: 5px;
+    /* Add space between buttons */
+}
+
+@media only screen and (max-width: 600px) {
+    .button-container {
+        flex-direction: column;
+    }
+
+    .button-container button {
+        margin-bottom: 5px;
+        /* Add space between buttons in vertical layout */
+        margin-right: 0;
+        /* Remove right margin in vertical layout */
+    }
+}
+
+.task-buttons {
+    display: flex;
+    gap: 15px;
+    /* Adjust the gap as needed */
+}
+
+input[type=""] {
+    transform: scale(1.5);
+    /* Increase the size of the checkbox */
+    margin-right: 5px;
+    /* Add some space between the checkbox and the label */
+}
+
+.task-content {
+    display: flex;
+    align-items: center;
+    /* Align items vertically */
+}
+
+.task-text {
+    margin-right: 20px;
+    /* Increase the gap between the task name and the checkbox */
+}
+
+/* Custom checkbox styles */
+.task-item {
+    position: relative;
+    /* Make the container relative */
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 1 0 30%;
+}
+
+.task-item p {
+    margin: 0 0 10px;
+}
+
+.task-item button {
+    padding: 5px 10px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* Custom checkbox styles */
+.task-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    position: absolute;
+    /* Position the checkbox absolutely */
+    top: 15px;
+    /* Adjust the top position as needed */
+    right: 10px;
+    /* Align to the right */
+}
+
+/* Custom checkbox checked state */
+.task-item input[type="checkbox"]:checked {
+    background-color: #3cb043;
+    border-color: #3cb043;
+}
+
+/* Custom checkbox checkmark */
+.task-item input[type="checkbox"]::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0 0;
+    /* Set the transform origin to top-left */
+    margin-top: -8px;
+    /* Adjust the position vertically */
+    margin-left: 0px;
+    /* Adjust the position horizontally */
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+/* Show checkmark when checkbox is checked */
+.task-item input[type="checkbox"]:checked::after {
+    opacity: 1;
+}
+
+.task-text {
+    margin-right: 20px;
+    /* Increase the gap between the task name and the checkbox */
+    text-decoration: none;
+    /* Initially no text decoration */
+}
+
+/* Add text decoration for checked tasks */
+.task-item input[type="checkbox"]:checked~.task-content .task-text {
+    text-decoration: line-through;
+    /* Add a line through the text */
+}
+
+.task-buttons button {
+    padding: 10px;
+    width: 150px;
+    font-size: 16px;
+    margin-right: 10px;
+    flex: 1;
+    font-size: 16px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.task-buttons button:hover {
+    background-color: #ddd;
+    /* Change background color on hover */
+    color: #333;
+    /* Change text color on hover */
+}
+
+task-buttons button:last-child {
+    margin-right: 0;
+    /* Remove margin from the last button to avoid extra space */
+}
+
+.task-buttons {
+    margin-top: 10px;
+    display: flex;
+    /* Use flexbox for layout */
+    justify-content: flex-end;
+    /* Align buttons to the right */
+}
+
+@media (max-width: 768px) {
+    .task-buttons button {
+        width: 80px;
+        /* Adjust width for smaller screens */
+        font-size: 14px;
+        /* Adjust font size for smaller screens */
+    }
+}
+
+
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+input[type="datetime-local"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.notifbtn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+}
+
+.notifbtn :hover {
+    background-color: #0056b3;
+}
+
+/* Responsive styles for Start & Stop Recording */
+@media (max-width: 768px) {
+
+    .primary-btn,
+    .danger-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .primary-btn,
+    .danger-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Style the button */
+.button-with-icon {
+    font-family: 'Font Awesome 5 Free';
+    /* Use the font family */
+    font-size: 24px;
+    /* Set font size */
+}
+
+#popupMessage {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #b4e0f7;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeInOut 3s ease-out;
+    max-width: 80%; /* Limit maximum width */
+    width: 300px; /* Set width */
+    text-align: center;
+    display: none;
+    /* Initially hidden */
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@media screen and (max-width: 600px) {
+    #popupMessage {
+        width: 90%; /* Adjust width for smaller screens */
+    }
+}
+.priority-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.priority-container label {
+    margin-right: 10px;
+}
+
+#prioritySelect {
+    width: 100%;
+    max-width: 200px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#prioritySelect option {
+    padding: 8px;
+}
+
+/* Styling for when the dropdown is opened */
+#prioritySelect:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.select-priority {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 600px) {
+    select-priority {
+        font-size: 14px;
+    }
+}
+
+.animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #3B93C3;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.animation {
+    max-width: 100%; /* Ensure the GIF doesn't exceed the width of the screen */
+    max-height: calc(100% - 60px); /* Ensure the GIF doesn't exceed the height of the screen minus header height */
+    width: auto;
+    height: auto;
+    margin-top: 60px; /* Ensure the animation is below the header */
+    margin-bottom: 60px; /* Ensure the animation is above any footer */
+}
+
+/* Adjustments for smaller screens */
+@media screen and (max-width: 768px) {
+    .animation {
+        margin-top: 40px; /* Adjust margin for smaller headers */
+        margin-bottom: 40px; /* Adjust margin for smaller footers */
+    }
+}
+
+/* Responsive layout for reminder date and time input */
+#reminderDateTimeInput {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#reminderDateTimeInput label {
+    margin-bottom: 10px;
+}
+
+#reminderDateTimeInput input {
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#reminderDateTimeInput button {
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#reminderDateTimeInput button:hover {
+    background-color: #0056b3;
+}
+
+/* Style for the View Tasks button */
+button.view-tasks-button {
+    background-color: #007BFF; /* Primary color */
+    color: #ffffff; /* White text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Padding for size */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin-top: 10px; /* Space above the button */
+    margin-bottom: 20px;
+}
+
+/* Hover effect */
+button.view-tasks-button:hover {
+    background-color: #0056b3; /* Darker shade of primary color */
+}
+
+/* Focus effect */
+button.view-tasks-button:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Custom focus shadow */
+}
+
+/*Task Counts*/
+
+#profileSection  {
+    font-size: 18px;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    color: #000000;
+    transition: background-color 0.3s ease;
+    /*font-family: 'Times New Roman', serif;*/
+}
+.chart-container {
+    width: 100%;
+    max-width: 180px; /* Adjust the maximum width as needed */
+    margin: 20px auto;
+}
+#taskPieChart {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.profile-divider {
+    border: 0;
+    height: 2px;
+    background: #000000; /* Black color */
+    margin: 8px 0; /* Space around the line */
+}
+
+#taskCount {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.task-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #DFF5FF;
+}
+
+
+
+/* --- Dark Mode Styles --- */
+body.dark-mode {
+    background: #222121;
+    color: #fff;
+}
+
+/* Header Styles */
+body.dark-mode .header {
+    background-color: #1e272e;
+    color: #fff;
+}
+
+/* Side Menu Styles */
+body.dark-mode .menu {
+    background: linear-gradient(to bottom, #2c3e50, #1e272e);
+}
+
+body.dark-mode .menu li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .menu a {
+    color: #fff;
+}
+
+/* Toggle Menu Button Styles */
+body.dark-mode .toggle-menu-btn {
+    background-color: transparent;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .toggle-menu-btn i {
+    background-color: #fff;
+}
+
+/* Main Content Styles */
+body.dark-mode .container {
+    background-color: #222f3e;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Form Section Styles */
+body.dark-mode .form-control {
+    border: 1px solid #555;
+}
+
+body.dark-mode .form-select {
+    border: 1px solid #555;
+}
+
+body.dark-mode .chat-section input[type="text"] {
+    border: 1px solid #555;
+}
+
+body.dark-mode .chat-section button {
+    background-color: #3498db;
+    border: none;
+}
+
+body.dark-mode .chatbot-response,
+body.dark-mode .spoken-task {
+    background-color: #0b0c0d;
+}
+
+body.dark-mode .loading {
+    border-top: 4px solid #fff;
+}
+
+/* Tasks Section Styles */
+body.dark-mode .tasks-section h2 {
+    color: #fff;
+}
+
+body.dark-mode .tasks {
+    gap: 20px;
+}
+
+body.dark-mode .task-item {
+    background-color: #2c3e50;
+    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .task-item p {
+    color: #34495e;
+}
+
+body.dark-mode .task-item button {
+    background-color: #e74c3c;
+}
+
+/* Button Styles */
+button {
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+}
+
+body.dark-mode .primary-btn {
+    background-color: #3498db;
+}
+
+body.dark-mode .primary-btn:hover {
+    background-color: #2980b9;
+}
+
+body.dark-mode .secondary-btn {
+    background-color: #2ecc71;
+}
+
+body.dark-mode .secondary-btn:hover {
+    background-color: #27ae60;
+}
+
+body.dark-mode .danger-btn {
+    background-color: #e74c3c;
+}
+
+body.dark-mode .danger-btn:hover {
+    background-color: #c0392b;
+}
+
+body.dark-mode .success-btn {
+    background-color: #f39c12;
+}
+
+body.dark-mode .success-btn:hover {
+    background-color: #d35400;
+}
+
+body.dark-mode .info-btn {
+    background-color: #9b59b6;
+}
+
+body.dark-mode .info-btn:hover {
+    background-color: #8e44ad;
+}
+
+body.dark-mode .warning-btn {
+    background-color: #f1c40f;
+}
+
+body.dark-mode .warning-btn:hover {
+    background-color: #f39c12;
+}
+
+/* Neat Input Text Box Styles */
+body.dark-mode .form-group {
+    margin-bottom: 20px;
+}
+
+body.dark-mode .form-control {
+    border: 1px solid #555;
+}
+
+body.dark-mode .form-select {
+    border: 1px solid #555;
+}
+
+body.dark-mode .popup-message-container {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .popup-message {
+    background-color: #0b0c0d;
+    border: 1px solid #555;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .popup-content {
+    color: #fff;
+}
+
+body.dark-mode .close-btn {
+    color: #fff;
+}
+
+body.dark-mode .okay-btn {
+    background-color: #007bff;
+}
+
+body.dark-mode .okay-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Custom checkbox styles */
+body.dark-mode .task-item input[type="checkbox"] {
+    border: 2px solid #555;
+}
+
+body.dark-mode .task-item input[type="checkbox"]:checked {
+    background-color: #3cb043;
+    border-color: #3cb043;
+}
+
+body.dark-mode .task-item input[type="checkbox"]::after {
+    border-color: white;
+}
+
+/* Add text decoration for checked tasks */
+body.dark-mode .task-item input[type="checkbox"]:checked~.task-content .task-text {
+    text-decoration: line-through;
+}
+
+body.dark-mode .task-item {
+    background-color: #2c3e50;
+    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .task-item p {
+    color: #fff;
+}
+
+body.dark-mode .task-item button {
+    background-color: #e74c3c;
+}
+
+body.dark-mode .task-buttons button {
+    background-color: transparent;
+    color: #fff;
+}
+
+body.dark-mode .task-buttons button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+/* Priority Select */
+body.dark-mode .select-priority {
+    border: 1px solid #555;
+}
+
+/* display mode styles */
+/* Display Mode Toggle Styles */
+.display-mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+/* Additional styles for Font Awesome icons */
+.display-mode-toggle span {
+    color: #ffd700; /* Adjust color */
+    font-size: 24px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.display-mode-toggle span:hover {
+    transform: scale(1.2);
+}
+
+/* --- Dark Mode Styles for Login --- */
+
+body.dark-mode .login-container {
+    background-color: #2c3e50;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    color: #3a3a3a;
+}
+
+body.dark-mode .login-container h2 {
+    color: #3a3a3a;
+}
+
+body.dark-mode .login-container input[type="text"],
+body.dark-mode .login-container input[type="password"] {
+    background-color: #3a3a3a;
+    border: 1px solid #555;
+    color: #3a3a3a;
+}
+
+body.dark-mode .login-container input[type="text"]::placeholder,
+body.dark-mode .login-container input[type="password"]::placeholder {
+    color: #3a3a3a;
+}
+
+body.dark-mode .login-container button {
+    background-color: #3498db;
+    color: #3a3a3a;
+}
+
+body.dark-mode .login-container button:hover {
+    background-color: #2980b9;
+}
+
+/* --- Dark Mode Styles for Chat Placeholder --- */
+
+body.dark-mode .chat-section input[type="text"]::placeholder {
+    color: #3a3a3a;
+}
+
+/* --- Dark Mode Styles for Priority Select --- */
+
+body.dark-mode .priority-container label {
+    color: #fafafa;
+}
+
+body.dark-mode #prioritySelect {
+    background-color: #3a3a3a;
+    border: 1px solid #555;
+    color: #fafafa;
+}
+
+body.dark-mode #prioritySelect option {
+    background-color: #3a3a3a;
+    color: #ffffff;
+}
+
+/* --- Dark Mode Styles for Back to View List Button --- */
+
+body.dark-mode .back-to-view-list-btn {
+    background-color: #3498db;
+    color: #fafafa;
+}
+
+body.dark-mode .back-to-view-list-btn:hover {
+    background-color: #2980b9;
+}
+
+/* --- Dark Mode Styles for Sort Button --- */
+
+body.dark-mode .sort-btn {
+    background-color: #9b59b6;
+    color: #34495e;
+}
+
+body.dark-mode .sort-btn:hover {
+    background-color: #8e44ad;
+}
+
+/* --- Dark Mode Styles for Back Button --- */
+
+body.dark-mode .back-btn {
+    background-color: #e74c3c;
+    color: #34495e;
+}
+
+body.dark-mode .back-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Apply dark mode styles to custom buttons */
+body.dark-mode .primary-btn {
+    background-color: #3498db;
+    color: #fafafa;
+}
+
+body.dark-mode .primary-btn:hover {
+    background-color: #2980b9;
+}
+
+body.dark-mode .secondary-btn {
+    background-color: #2ecc71;
+    color: #fafafa;
+}
+
+body.dark-mode .secondary-btn:hover {
+    background-color: #27ae60;
+}
+
+body.dark-mode .danger-btn {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+body.dark-mode .danger-btn:hover {
+    background-color: #c0392b;
+}
+
+body.dark-mode .success-btn {
+    background-color: #f39c12;
+    color: #fff;
+}
+
+body.dark-mode .success-btn:hover {
+    background-color: #d35400;
+}
+
+body.dark-mode .info-btn {
+    background-color: #9b59b6;
+    color: #fff;
+}
+
+body.dark-mode .info-btn:hover {
+    background-color: #8e44ad;
+}
+
+body.dark-mode .warning-btn {
+    background-color: #f1c40f;
+    color: #fff;
+}
+
+body.dark-mode .warning-btn:hover {
+    background-color: #f39c12;
+}
+
+/* Dark Mode Styles for Sort Button */
+body.dark-mode .sort-btn {
+    background-color: #2c3e50;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode .sort-btn:hover {
+    background-color: #34495e;
+    color: #fff;
+}
+
+/* Dark Mode Styles for Login Input Placeholder */
+body.dark-mode .login-input::placeholder {
+    color: #34495e;
+}
+
+/* Dark Mode Styles for Chat Input Placeholder */
+body.dark-mode .chat-input::placeholder {
+    color: #34495e;
+}
+
+/* Dark Mode Styles for Task Priority Select */
+body.dark-mode .select-priority {
+    border: 1px solid #555;
+    background-color: #2c3e50;
+    color: #fff;
+}
+
+body.dark-mode .select-priority option {
+    background-color: #2c3e50;
+    color: #fff;
+}
+
+/* Dark Mode Styles for Back to View List Button */
+body.dark-mode .back-to-view-btn {
+    background-color: #2c3e50;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode .back-to-view-btn:hover {
+    background-color: #34495e;
+    color: #fff;
+}
+
+/* Dark Mode Styles for Sort Button */
+body.dark-mode .sort-btn {
+    background-color: #2c3e50;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode .sort-btn:hover {
+    background-color: #34495e;
+    color: #fff;
+}
+
+/* Dark Mode Styles for Back Button */
+body.dark-mode .back-btn {
+    background-color: #2c3e50;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode .back-btn:hover {
+    background-color: #34495e;
+    color: #fff;
+}
+
+/* dark mode styles for all inputs */
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+body.dark-mode input {
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #555555;
+}
+
+body.dark-mode input::placeholder {
+    color: #aaaaaa;
+}
+
+/* Specific input fields */
+body.dark-mode #loginUsername,
+body.dark-mode #loginPassword,
+body.dark-mode #registerUsername,
+body.dark-mode #registerPassword,
+body.dark-mode #registerEmail,
+body.dark-mode #chatInput,
+body.dark-mode #notificationDate,
+body.dark-mode #notificationTime,
+body.dark-mode #reminderDate,
+body.dark-mode #reminderTime,
+body.dark-mode #updateTaskId,
+body.dark-mode #updateTaskText,
+body.dark-mode #updateTaskDate,
+body.dark-mode #updateTaskTime,
+body.dark-mode #updateReminderDate,
+body.dark-mode #updateReminderTime {
+    background-color: #212121;
+    color: #ffffff;
+    border: 1px solid #555555;
+}
+
+body.dark-mode .form-control {
+    background-color: #212121;
+    color: #ffffff;
+    border: 1px solid #555555;
+}
+
+body.dark-mode .form-select {
+    background-color: #212121;
+    color: #ffffff;
+    border: 1px solid #555555;
+}
+
+body.dark-mode .input-group-text {
+    background-color: #212121;
+    color: #ffffff;
+    border: 1px solid #555555;
+}
+/* Back to View List button */
+body.dark-mode button.backToViewListButton {
+    background-color: transparent;
+    color: #ffffff;
+    
+}
+
+body.dark-mode button.backToViewListButton:hover {
+    background-color: #555555;
+}
