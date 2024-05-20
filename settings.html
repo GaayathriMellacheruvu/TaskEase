@@ -14,8 +14,8 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <h1 class="header-title">TaskEase Settings</h1>
-            <p class="header-tagline">Customize Your Experience</p>
+            <h1 class="header-title">TaskEase</h1>
+            <p class="header-tagline">Simplify Your Tasks</p>
         </div>
     </header>
 
@@ -27,63 +27,75 @@
                 <section class="settings">
                     <h2>Settings</h2>
                     <div class="toggle" onclick="toggleDarkMode()">
-                        <label for="darkModeToggle">Dark Mode</label>
+                        <label for="darkModeToggle">Light Mode / Dark Mode</label>
                         <div id="darkModeToggle" class="toggle-switch"></div>
                     </div>
-                    <div class="font-settings">
-                        <label for="fontFamily">Font</label>
-                        <select id="fontFamily" onchange="changeFontFamily()">
-                            <option value="Arial, sans-serif">Arial</option>
-                            <option value="Verdana, sans-serif">Verdana</option>
-                            <option value="Tahoma, sans-serif">Tahoma</option>
-                            <option value="Georgia, serif">Georgia</option>
-                            <option value="Times New Roman, serif">Times New Roman</option>
-                            <option value="Courier New, monospace">Courier New</option>
-                            <option value="Lucida Sans Unicode, Lucida Grande, sans-serif">Lucida Sans Unicode</option>
-                            <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
-                            <option value="Comic Sans MS, cursive, sans-serif">Comic Sans MS</option>
-                            <option value="Impact, Charcoal, sans-serif">Impact</option>
-                            <option value="Palatino Linotype, Book Antiqua, Palatino, serif">Palatino Linotype</option>
-                            <option value="Arial Black, Gadget, sans-serif">Arial Black</option>
-                            <option value="Gill Sans, Gill Sans MT, Calibri, sans-serif">Gill Sans</option>
-                            <option value="Helvetica, sans-serif">Helvetica</option>
-                        </select>
-                        <label for="fontSize">Font Size</label>
-                        <select id="fontSize" onchange="changeFontSize()">
-                            <option value="12px">Small</option>
-                            <option value="16px">Medium</option>
-                            <option value="20px">Large</option>
-                        </select>
+                    <div class="row mb-3">
+                        <label for="fontFamily" class="col-sm-6 col-form-label">Font</label>
+                        <div class="col-sm-6">
+                            <select id="fontFamily" class="form-select" onchange="changeFontFamily()">
+                                <option value="Arial, sans-serif">Arial</option>
+                                <option value="Verdana, sans-serif">Verdana</option>
+                                <option value="Tahoma, sans-serif">Tahoma</option>
+                                <option value="Georgia, serif">Georgia</option>
+                                <option value="Times New Roman, serif">Times New Roman</option>
+                                <option value="Courier New, monospace">Courier New</option>
+                                <option value="Lucida Sans Unicode, Lucida Grande, sans-serif">Lucida Sans Unicode</option>
+                                <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+                                <option value="Comic Sans MS, cursive, sans-serif">Comic Sans MS</option>
+                                <option value="Impact, Charcoal, sans-serif">Impact</option>
+                                <option value="Palatino Linotype, Book Antiqua, Palatino, serif">Palatino Linotype</option>
+                                <option value="Arial Black, Gadget, sans-serif">Arial Black</option>
+                                <option value="Gill Sans, Gill Sans MT, Calibri, sans-serif">Gill Sans</option>
+                                <option value="Helvetica, sans-serif">Helvetica</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="color-settings">
-                        <label for="lightThemeColor">Light Theme Color</label>
-                        <select id="lightThemeColor" onchange="changeThemeColor('light')">
-                            <option value="#ffffff">White</option>
-                            <option value="#f8f9fa">Light Gray</option>
-                            <option value="#e0e0e0">Silver</option>
-                            <option value="#fffff0">Ivory</option>
-                            <option value="#fff0f5">Lavender Blush</option>
-                            <option value="#f5fffa">Mint Cream</option>
-                            <option value="#f0f8ff">Alice Blue</option>
-                            <option value="#f0fff0">Honeydew</option>
-                            <option value="#fffaf0">Floral White</option>
-                            <option value="#fdf5e6">Old Lace</option>
-                            <option value="#fff5ee">Seashell</option>
-                        </select>
-                        <label for="darkThemeColor">Dark Theme Color</label>
-                        <select id="darkThemeColor" onchange="changeThemeColor('dark')">
-                            <option value="#1e1e1e">Dark Gray</option>
-                            <option value="#333333">Dim Gray</option>
-                            <option value="#4f4f4f">Gray</option>
-                            <option value="#36454f">Charcoal</option>
-                            <option value="#2a3439">Gunmetal</option>
-                            <option value="#555d50">Ebony</option>
-                            <option value="#242124">Raisin Black</option>
-                            <option value="#2f4f4f">Dark Slate Gray</option>
-                            <option value="#343434">Jet</option>
-                            <option value="#414a4c">Outer Space</option>
-                            <option value="#1b1b1b">Eerie Black</option>
-                        </select>
+                    <div class="row mb-3">
+                        <label for="fontSize" class="col-sm-6 col-form-label">Font Size</label>
+                        <div class="col-sm-6">
+                            <select id="fontSize" class="form-select" onchange="changeFontSize()">
+                                <option value="12px">Small</option>
+                                <option value="16px">Medium</option>
+                                <option value="20px">Large</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="lightThemeColor" class="col-sm-6 col-form-label">Light Theme Color</label>
+                        <div class="col-sm-6">
+                            <select id="lightThemeColor" class="form-select" onchange="changeThemeColor('light')">
+                                <option value="#ffffff">White</option>
+                                <option value="#f8f9fa">Light Gray</option>
+                                <option value="#e0e0e0">Silver</option>
+                                <option value="#fffff0">Ivory</option>
+                                <option value="#fff0f5">Lavender Blush</option>
+                                <option value="#f5fffa">Mint Cream</option>
+                                <option value="#f0f8ff">Alice Blue</option>
+                                <option value="#f0fff0">Honeydew</option>
+                                <option value="#fffaf0">Floral White</option>
+                                <option value="#fdf5e6">Old Lace</option>
+                                <option value="#fff5ee">Seashell</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="darkThemeColor" class="col-sm-6 col-form-label">Dark Theme Color</label>
+                        <div class="col-sm-6">
+                            <select id="darkThemeColor" class="form-select" onchange="changeThemeColor('dark')">
+                                <option value="#1e1e1e">Dark Gray</option>
+                                <option value="#333333">Dim Gray</option>
+                                <option value="#4f4f4f">Gray</option>
+                                <option value="#36454f">Charcoal</option>
+                                <option value="#2a3439">Gunmetal</option>
+                                <option value="#555d50">Ebony</option>
+                                <option value="#242124">Raisin Black</option>
+                                <option value="#2f4f4f">Dark Slate Gray</option>
+                                <option value="#343434">Jet</option>
+                                <option value="#414a4c">Outer Space</option>
+                                <option value="#1b1b1b">Eerie Black</option>
+                            </select>
+                        </div>
                     </div>
                 </section>
             </main>
