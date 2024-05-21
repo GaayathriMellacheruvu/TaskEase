@@ -1,8 +1,8 @@
-fastapi==0.68.0
+fastapi==0.109.1
 uvicorn==0.15.0
 pymongo
 python-dotenv==0.19.2
-requests==2.26.0
+requests==2.32.0
 datefinder==0.7.1
 openai
 python-multipart
