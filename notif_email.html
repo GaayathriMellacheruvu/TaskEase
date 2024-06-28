@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Reminder</title>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+}
+
+.header {
+    width: 100%;
+    text-align: center;
+    background-color: #e0f7fa;
+    padding: 20px 0;
+}
+
+.header img {
+    width: 80%;
+    max-width: 400px;
+    display: block;
+    margin: 0 auto;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.content {
+    text-align: left;
+}
+
+h2 {
+    color: #3498db;
+    margin: 0 0 20px 0;
+    font-size: 24px;
+}
+
+p {
+    color: #333333;
+    line-height: 1.6;
+    margin: 10px 0;
+}
+
+strong {
+    color: #4caf50;
+}
+
+.task {
+    display: block;
+    background-color: #e0f7fa;
+    padding: 10px;
+    margin: 20px 0;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 8px;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 14px;
+    color: #999999;
+}
+
+/* Media queries for smaller screens */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .task {
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    .task {
+        font-size: 14px;
+    }
+}
+</style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="cid:bg_image" alt="Header Image">
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <h2>Task Reminder</h2>
+            <p>Dear User,</p>
+            <p>This is a reminder for the following task:</p>
+            <span class="task">{message}</span>
+            <br>
+            <p>Best Regards,</p>
+            <p>The TaskEase Team</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>TaskEase. All rights reserved.</p>
+    </div>
+
+</body>
+</html>

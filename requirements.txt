@@ -1,8 +1,4 @@
 fastapi==0.68.0
 uvicorn==0.15.0
-pymongo
-python-dotenv==0.19.2
-requests==2.26.0
-datefinder==0.7.1
-openai
-python-multipart
+pymongo==3.12.0
+pydantic==1.10.0
