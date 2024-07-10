@@ -1,6 +1,6 @@
 # TaskEase
 
-TaskEase is a cutting-edge Automated Task Manager designed to streamline and enhance task handling through advanced AI capabilities, including Natural Language Processing (NLP) technologies. This application revolutionizes task management by offering enhanced efficiency and user-friendliness.
+T  askEase is a cutting-edge Automated Task Manager designed to streamline and enhance task handling through advanced AI capabilities, including Natural Language Processing (NLP) technologies. This application revolutionizes task management by offering enhanced efficiency and user-friendliness.
 
 In the modern digital landscape, efficient task management is crucial for optimizing productivity. TaskEase leverages sophisticated NLP algorithms to interpret natural language input, allowing users to input tasks in conversational language. This ensures precise classification and extraction of task details from unstructured text, facilitating better organization and prioritization.
 
